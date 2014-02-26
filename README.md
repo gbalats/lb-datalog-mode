@@ -12,6 +12,7 @@ MIT license (see `LICENSE`)
 Installation
 ------------
 
-Put this file into your load-path and the following into your `~/.emacs`:
+Put the file `lb-datalog-mode.el` into your load-path and the
+following into your `~/.emacs`:
 
     (require 'lb-datalog-mode)
