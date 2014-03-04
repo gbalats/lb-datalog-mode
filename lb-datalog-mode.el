@@ -113,6 +113,7 @@ For detail, see `comment-dwim'."
 ;; define the mode
 (define-derived-mode lb-datalog-mode prog-mode "lb-datalog mode"
   "Major mode for editing LB Datalog ..."
+  :group 'lb-datalog
 
   (interactive)
   (kill-all-local-variables)
