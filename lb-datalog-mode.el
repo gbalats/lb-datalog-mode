@@ -37,10 +37,11 @@
   :group 'lb-datalog)
 
 (defcustom lb-datalog-mode-hook nil
-  "List of functions to be executed on entry to `lb-datalog-mode'."
+  "*List of functions to be executed on entry to `lb-datalog-mode'.*"
   :type  'hook
   :group 'lb-datalog)
 
+;; Keywords
 (defconst lb-datalog-keywords
       '("agg" "not" "exists" "true" "false"))
 
@@ -98,9 +99,26 @@ For detail, see `comment-dwim'."
   "Syntax table for `lb-datalog-mode'.")
 
 
+;; keymap
+(defvar lb-datalog-mode-map nil
+         "Keymap for `lb-datalog-mode' major mode.")
+
+(if lb-datalog-mode-map
+    nil
+  (setq lb-datalog-mode-map (make-sparse-keymap))
+  (define-key lb-datalog-mode-map [remap comment-dwim]
+    'lb-datalog-comment-dwim))
+
+
 ;; define the mode
 (define-derived-mode lb-datalog-mode prog-mode "lb-datalog mode"
   "Major mode for editing LB Datalog ..."
+
+  (interactive)
+  (kill-all-local-variables)
+
+  ; Select the mode's keymap.
+  (use-local-map lb-datalog-mode-map)
 
   ;; Comments start with `//'.
   (set (make-local-variable 'comment-start) "//")
@@ -109,15 +127,15 @@ For detail, see `comment-dwim'."
   (set (make-local-variable 'font-lock-defaults)
        '(lb-datalog-font-lock-keywords))
 
-  ;; mode name
-  (set (make-local-variable 'mode-name) "lb-datalog")
-
   ;; syntax table
   (set-syntax-table lb-datalog-syntax-table)
 
-  ;; modify the keymap
-  (define-key lb-datalog-mode-map [remap comment-dwim]
-    'lb-datalog-comment-dwim))
+  ;; major mode name
+  (setq mode-name "LB-Datalog")
+  (setq major-mode 'lb-datalog-mode)
+
+  ;; permit the user to customize the mode with a hook
+  (run-hooks 'lb-datalog-mode-hook))
 
 
 ;; Add file association
