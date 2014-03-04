@@ -80,6 +80,7 @@
       (,variable-regexp . font-lock-variable-name-face)))
   "Font-lock keywords for `lb-datalog-mode'.")
 
+
 ;; command to comment/uncomment text
 (defun lb-datalog-comment-dwim (arg)
   "Comment or uncomment current line or region in a smart way.
@@ -87,6 +88,45 @@ For detail, see `comment-dwim'."
   (interactive "*P")
   (let ((comment-start "//") (comment-end ""))
     (comment-dwim arg)))
+
+
+;; command to bypass comment
+(defun lb-datalog-forward-comment (&optional direction)
+  "LB Datalog mode specific version of `forward-comment'.
+Optional argument DIRECTION defines the direction to move to."
+  (let ((comment-start "//")
+        (factor (if (< (or direction 0) 0) -99999 99999)))
+    (forward-comment factor)))
+
+
+;; move by clauses
+(defun lb-datalog-backward-clause (&optional arg)
+  "Move backward to previous clause.
+With ARG, repeat.  See `lb-datalog-forward-clause'."
+  (interactive "^p")
+  (or arg (setq arg 1))
+  (lb-datalog-forward-clause (- arg)))
+
+(defun lb-datalog-forward-clause (&optional arg)
+  "Move forward to the next clause.
+With ARG, repeat.  With negative argument, move ARG times
+backward to previous clause."
+  (interactive "^p")
+  (or arg (setq arg 1))
+  (while (> arg 0)
+    (lb-datalog-forward-comment 1)
+    (re-search-forward "\\.")
+    (setq arg (1- arg)))
+  (while (< arg 0)
+    (lb-datalog-forward-comment -1)
+    (backward-char)
+    (re-search-backward "\\.\\|\\`")
+    (if (= (char-after) ?\.)
+        (forward-char))
+    (skip-chars-forward "[:space:]")
+    (lb-datalog-forward-comment 1)
+    (setq arg (1+ arg))))
+
 
 ;; syntax table
 (defvar lb-datalog-syntax-table
@@ -100,14 +140,14 @@ For detail, see `comment-dwim'."
 
 
 ;; keymap
-(defvar lb-datalog-mode-map nil
-         "Keymap for `lb-datalog-mode' major mode.")
-
-(if lb-datalog-mode-map
-    nil
-  (setq lb-datalog-mode-map (make-sparse-keymap))
-  (define-key lb-datalog-mode-map [remap comment-dwim]
-    'lb-datalog-comment-dwim))
+(defvar lb-datalog-mode-map
+  (let ((map (make-sparse-keymap)))
+    ;; modify the keymap
+    (define-key map "\M-e" 'lb-datalog-forward-clause)
+    (define-key map "\M-a" 'lb-datalog-backward-clause)
+    (define-key map [remap comment-dwim] 'lb-datalog-comment-dwim)
+    map)
+  "Keymap for `lb-datalog-mode'.")
 
 
 ;; define the mode
@@ -137,7 +177,6 @@ For detail, see `comment-dwim'."
 
   ;; permit the user to customize the mode with a hook
   (run-hooks 'lb-datalog-mode-hook))
-
 
 ;; Add file association
 (add-to-list 'auto-mode-alist '("\\.logic$" . lb-datalog-mode))
