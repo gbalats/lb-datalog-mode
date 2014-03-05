@@ -31,7 +31,7 @@
   :type  'face
   :group 'lb-datalog)
 
-(defcustom lb-datalog-predicate-face 'font-lock-builtin-face
+(defcustom lb-datalog-predicate-face 'font-lock-function-name-face
   "Face for predicate names in `lb-datalog-mode' buffers."
   :type  'face
   :group 'lb-datalog)
@@ -70,12 +70,14 @@
   (let* ((variable-regexp "[[:alpha:]_?][[:word:]_]*")
          (predicate-name-regexp "\\sw+\\(?:[:_?$]\\sw+\\)*")
          (predicate-ref-regexp (concat "`" predicate-name-regexp))
+         (builtin-predicate-regexp (concat "lang:" predicate-name-regexp))
          (predicate-regexp (concat "\\(" predicate-name-regexp "\\)"
                                    "\\s(.*?\\s)")))
     `((,lb-datalog-types-regexp . font-lock-type-face)
       (,lb-datalog-keywords-regexp . font-lock-keyword-face)
       (,lb-datalog-number-regexp . font-lock-warning-face)
       (,predicate-ref-regexp . font-lock-reference-face)
+      (,builtin-predicate-regexp . font-lock-builtin-face)
       (,predicate-regexp 1 lb-datalog-predicate-face)
       (,variable-regexp . font-lock-variable-name-face)))
   "Font-lock keywords for `lb-datalog-mode'.")
