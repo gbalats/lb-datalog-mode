@@ -168,7 +168,7 @@ backward to previous clause."
   (interactive)
   (kill-all-local-variables)
 
-  ; Select the mode's keymap.
+  ;; Select the mode's keymap.
   (use-local-map lb-datalog-mode-map)
 
   ;; Comments start with `//'.
