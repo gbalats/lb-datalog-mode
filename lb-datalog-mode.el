@@ -179,6 +179,11 @@ backward to previous clause."
   "Keymap for `lb-datalog-mode'.")
 
 
+;; backwards compatibility
+(when (< emacs-major-version 24)
+  (defalias 'prog-mode 'fundamental-mode))
+
+
 ;; define the mode
 (define-derived-mode lb-datalog-mode prog-mode "lb-datalog mode"
   "Major mode for editing LB Datalog ..."
