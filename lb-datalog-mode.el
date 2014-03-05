@@ -113,18 +113,28 @@ With ARG, repeat.  With negative argument, move ARG times
 backward to previous clause."
   (interactive "^p")
   (or arg (setq arg 1))
+  ;; moving forward
   (while (> arg 0)
-    (lb-datalog-forward-comment 1)
-    (re-search-forward "\\.")
+    (lb-datalog-forward-comment 1)      ; bypass comment
+    (while                              ; search for dot
+        (progn
+          (re-search-forward "\\." nil t 1)
+          (nth 8 (syntax-ppss))))       ; while ignoring those inside
+                                        ; comments or strings
     (setq arg (1- arg)))
+  ;; moving backwards
   (while (< arg 0)
-    (lb-datalog-forward-comment -1)
+    (lb-datalog-forward-comment -1)     ; bypass backward comment
     (backward-char)
-    (re-search-backward "\\.\\|\\`")
+    (while                              ; search for previous dot
+        (progn
+          (re-search-backward "\\`\\|\\." nil t 1)
+          (nth 8 (syntax-ppss))))       ; while ignoring those inside
+                                        ; comments or strings
     (if (= (char-after) ?\.)
         (forward-char))
-    (skip-chars-forward "[:space:]")
-    (lb-datalog-forward-comment 1)
+    (skip-chars-forward "[:space:]")    ; skip spaces
+    (lb-datalog-forward-comment 1)      ; skip comments
     (setq arg (1+ arg))))
 
 
