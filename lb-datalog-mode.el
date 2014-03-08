@@ -267,6 +267,8 @@ backward to previous clause."
     (define-key map "\M-e" 'lb-datalog-forward-clause)
     (define-key map "\M-a" 'lb-datalog-backward-clause)
     (define-key map [remap comment-dwim] 'lb-datalog-comment-dwim)
+    (if lb-datalog-electric-newline-flag
+      (define-key map "\r" 'reindent-then-newline-and-indent))
     map)
   "Keymap for `lb-datalog-mode'.")
 
