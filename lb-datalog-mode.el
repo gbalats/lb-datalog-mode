@@ -166,14 +166,14 @@
     ("+" -500 -500)
     ("-" -500 -500)
     ("*" -400 -400)
-    ("/" -400 -400))
-    ; (:smie-closer-alist (t . "."))
+    ("/" -400 -400)
+    (:smie-closer-alist (t . ".")))
   "Precedence levels of infix operators.")
 
 (defun lb-datalog-smie-rules (kind token)
   (pcase (cons kind token)
     (`(:elem . basic) lb-datalog-indent-width)
-    ;; (`(:after . ".") 0) ;; To work around smie-closer-alist.
+    (`(:after . ".") '(column . 0)) ; To work around smie-closer-alist.
     (`(,_ . ,(or `"," `";")) (smie-rule-separator kind))
     (`(:before . ,(or `"<-" `"->"))
      (when (smie-rule-bolp) (smie-rule-parent 1)))
