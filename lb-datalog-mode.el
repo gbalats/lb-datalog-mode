@@ -14,13 +14,22 @@
 
 (provide 'lb-datalog-mode)
 
+
+;;----------------------------
 ;; Prerequisites
+;;----------------------------
+
 (require 'font-lock)
 (require 'newcomment)
+(require 'smie)
 (eval-when-compile
   (require 'regexp-opt))
 
+
+;;----------------------------
 ;; Local variables
+;;----------------------------
+
 (defgroup lb-datalog nil
   "Major mode `lb-datalog-mode' for editing LB Datalog code."
   :prefix "lb-datalog-"
@@ -41,7 +50,19 @@
   :type  'hook
   :group 'lb-datalog)
 
+(defcustom lb-datalog-indent-width 3
+  "Level of indentation in `lb-datalog-mode' buffers."
+  :type 'integer
+  :group 'lb-datalog)
+
+(defvar lb-datalog-electric-newline-flag t
+  "*Non-nil means automatically indent the next line when the user types RET.")
+
+
+;;----------------------------
 ;; Keywords
+;;----------------------------
+
 (defconst lb-datalog-keywords
       '("agg" "not" "exists" "true" "false"))
 
@@ -100,7 +121,69 @@
   "Font-lock keywords for `lb-datalog-mode'.")
 
 
-;; command to comment/uncomment text
+;;----------------------------
+;; Indentation
+;;----------------------------
+
+;; (defvar lb-datalog-smie-grammar
+;;   (smie-prec2->grammar
+;;    (smie-bnf->prec2
+;;     '((id)
+;;       (clause (atoms "<-" atoms ".")
+;;               (atoms "->" atoms ".")
+;;               (atoms "."))
+;;       (atom (pred "(" exps ")")
+;;             (pred "[" exps "]" = exp))
+;;       (atoms (atoms "," atoms)
+;;              (atoms ";" atoms)
+;;              ("!" atom)
+;;              (atom))
+;;       (exp (id)
+;;            (exp "+" exp)
+;;            (exp "-" exp)
+;;            (exp "*" exp)
+;;            (exp "/" exp))
+;;       (exps (exps "," exps) (exp)))
+;;     '((assoc ",") (assoc ";"))
+;;     '((assoc "+") (assoc "-") (assoc "*") (assoc "/")))))
+
+(defconst lb-datalog-smie-grammar
+  ;; Rather than construct the operator levels table from the BNF, we
+  ;; directly provide the operator precedences as in GNU Prolog's
+  ;; manual. The only problem is that GNU Prolog's manual uses
+  ;; precedence levels in the opposite sense (higher numbers bind less
+  ;; tightly) than SMIE, so we use negative numbers.
+  '(("." -10000 -10000)
+    ("<-" -1200 -1200)
+    ("->" -1200 -1200)
+    (";" -1100 -1100)
+    ("," -1000 -1000)
+    ("=" -700 -700)
+    ("<" -700 -700)
+    ("<=" -700 -700)
+    (">" -700 -700)
+    (">=" -700 -700)
+    ("+" -500 -500)
+    ("-" -500 -500)
+    ("*" -400 -400)
+    ("/" -400 -400))
+    ; (:smie-closer-alist (t . "."))
+  "Precedence levels of infix operators.")
+
+(defun lb-datalog-smie-rules (kind token)
+  (pcase (cons kind token)
+    (`(:elem . basic) lb-datalog-indent-width)
+    ;; (`(:after . ".") 0) ;; To work around smie-closer-alist.
+    (`(,_ . ,(or `"," `";")) (smie-rule-separator kind))
+    (`(:before . ,(or `"<-" `"->"))
+     (when (smie-rule-bolp) (smie-rule-parent 1)))
+    (`(:after . ,(or `"<-" `"->")) lb-datalog-indent-width)))
+
+
+;;----------------------------
+;; Comment-specific commands
+;;----------------------------
+
 (defun lb-datalog-comment-dwim (arg)
   "Comment or uncomment current line or region in a smart way.
 For detail, see `comment-dwim'."
@@ -118,7 +201,10 @@ Optional argument DIRECTION defines the direction to move to."
     (forward-comment factor)))
 
 
-;; move by clauses
+;;----------------------------
+;; Movement by clauses
+;;----------------------------
+
 (defun lb-datalog-backward-clause (&optional arg)
   "Move backward to previous clause.
 With ARG, repeat.  See `lb-datalog-forward-clause'."
@@ -157,7 +243,10 @@ backward to previous clause."
     (setq arg (1+ arg))))
 
 
+;;----------------------------
 ;; syntax table
+;;----------------------------
+
 (defvar lb-datalog-syntax-table
   (let ((st (make-syntax-table)))
     ;; C++ style comment `//' ..."
@@ -168,7 +257,10 @@ backward to previous clause."
   "Syntax table for `lb-datalog-mode'.")
 
 
+;;----------------------------
 ;; keymap
+;;----------------------------
+
 (defvar lb-datalog-mode-map
   (let ((map (make-sparse-keymap)))
     ;; modify the keymap
@@ -179,12 +271,18 @@ backward to previous clause."
   "Keymap for `lb-datalog-mode'.")
 
 
+;;----------------------------
 ;; backwards compatibility
+;;----------------------------
+
 (when (< emacs-major-version 24)
   (defalias 'prog-mode 'fundamental-mode))
 
 
+;;----------------------------
 ;; define the mode
+;;----------------------------
+
 (define-derived-mode lb-datalog-mode prog-mode "lb-datalog mode"
   "Major mode for editing LB Datalog ..."
   :group 'lb-datalog
@@ -205,6 +303,9 @@ backward to previous clause."
   ;; syntax table
   (set-syntax-table lb-datalog-syntax-table)
 
+  ;; smie setup
+  (smie-setup lb-datalog-smie-grammar #'lb-datalog-smie-rules)
+
   ;; major mode name
   (setq mode-name "LB-Datalog")
   (setq major-mode 'lb-datalog-mode)
@@ -212,5 +313,9 @@ backward to previous clause."
   ;; permit the user to customize the mode with a hook
   (run-hooks 'lb-datalog-mode-hook))
 
+
+;;----------------------------
 ;; Add file association
+;;----------------------------
+
 (add-to-list 'auto-mode-alist '("\\.logic$" . lb-datalog-mode))
