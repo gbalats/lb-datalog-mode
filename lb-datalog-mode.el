@@ -101,7 +101,7 @@
   (let* ((variable-regexp "[[:alpha:]_?][[:word:]_]*")
          (predicate-name-regexp "\\sw+\\(?:[:_?$]\\sw+\\)*")
          (predicate-ref-regexp (concat "`" predicate-name-regexp))
-         (builtin-predicate-regexp (concat "^lang:" predicate-name-regexp))
+         (builtin-predicate-regexp (concat "\\_<lang:" predicate-name-regexp))
          (predicate-regexp
           (concat "\\(" predicate-name-regexp "\\)"
                   "\\s(.*?\\s)"))
@@ -253,6 +253,7 @@ backward to previous clause."
     (modify-syntax-entry ?/ ". 124b" st)
     (modify-syntax-entry ?* ". 23" st)
     (modify-syntax-entry ?\n "> b" st)
+    (modify-syntax-entry ?: "_" st)
     st)
   "Syntax table for `lb-datalog-mode'.")
 
