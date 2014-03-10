@@ -79,7 +79,7 @@
 
 (defconst lb-datalog-types-regexp
   (eval-when-compile
-    (regexp-opt lb-datalog-types 'words)))
+    (regexp-opt lb-datalog-types 'symbols)))
 
 (defconst lb-datalog-number-regexp
   (concat "\\<[[:digit:]]+"
@@ -254,6 +254,7 @@ backward to previous clause."
     (modify-syntax-entry ?* ". 23" st)
     (modify-syntax-entry ?\n "> b" st)
     (modify-syntax-entry ?: "_" st)
+    (modify-syntax-entry ?? "_" st)
     st)
   "Syntax table for `lb-datalog-mode'.")
 
