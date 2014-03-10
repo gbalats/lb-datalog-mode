@@ -104,11 +104,11 @@
          (builtin-predicate-regexp (concat "\\_<lang:" predicate-name-regexp))
          (predicate-regexp
           (concat "\\(" predicate-name-regexp "\\)"
-                  "\\s(.*?\\s)"))
+                  "\\s(.*?\\s)"))       ; non-greedy *? operator inside paren
          (staged-predicate-regexp
           (concat "\\(" predicate-name-regexp "\\)"
                   "\\(" lb-datalog-stage-modifier-regexp "\\)"
-                  "\\s(.*?\\s)")))
+                  "\\s(.*?\\s)")))      ; non-greedy *? operator inside paren
     `((,lb-datalog-types-regexp . font-lock-type-face)
       (,lb-datalog-keywords-regexp . font-lock-keyword-face)
       (,lb-datalog-number-regexp . font-lock-warning-face)
