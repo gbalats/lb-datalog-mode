@@ -177,7 +177,9 @@
     (`(,_ . ,(or `"," `";")) (smie-rule-separator kind))
     (`(:before . ,(or `"<-" `"->"))
      (when (smie-rule-bolp) (smie-rule-parent 1)))
-    (`(:after . ,(or `"<-" `"->")) lb-datalog-indent-width)))
+    (`(:after . ,(or `"<-" `"->"))
+     (if (smie-rule-hanging-p) lb-datalog-indent-width
+       (1- lb-datalog-indent-width)))))
 
 
 ;;----------------------------
