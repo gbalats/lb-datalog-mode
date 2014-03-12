@@ -317,7 +317,7 @@ backward to previous clause."
   (setq major-mode 'lb-datalog-mode)
 
   ;; permit the user to customize the mode with a hook
-  (run-hooks 'lb-datalog-mode-hook))
+  (run-mode-hooks 'lb-datalog-mode-hook))
 
 
 ;;----------------------------
