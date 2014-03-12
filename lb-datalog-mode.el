@@ -55,7 +55,7 @@
   :type 'integer
   :group 'lb-datalog)
 
-(defvar lb-datalog-electric-newline-flag t
+(defvar lb-datalog-electric-newline-p t
   "*Non-nil means automatically indent the next line when the user types RET.")
 
 
@@ -271,7 +271,7 @@ backward to previous clause."
     (define-key map "\M-e" 'lb-datalog-forward-clause)
     (define-key map "\M-a" 'lb-datalog-backward-clause)
     (define-key map [remap comment-dwim] 'lb-datalog-comment-dwim)
-    (if lb-datalog-electric-newline-flag
+    (when lb-datalog-electric-newline-p
       (define-key map "\r" 'reindent-then-newline-and-indent))
     map)
   "Keymap for `lb-datalog-mode'.")
