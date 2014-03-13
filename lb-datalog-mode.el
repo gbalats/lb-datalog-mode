@@ -63,23 +63,20 @@
 ;; Keywords
 ;;----------------------------
 
-(defconst lb-datalog-keywords
-      '("agg" "not" "exists" "true" "false"))
-
-(defconst lb-datalog-types
-      '("int" "int[8]" "int[16]" "int[32]" "int[64]"
-        "uint[8]" "uint[16]" "uint[32]" "uint[64]"
-        "float" "float[32]" "float[64]"
-        "decimal" "decimal[64]" "decimal[128]"
-        "boolean" "string" "datetime" "color"))
-
 (defconst lb-datalog-keywords-regexp
   (eval-when-compile
-    (regexp-opt lb-datalog-keywords 'words)))
+    (regexp-opt '("agg" "not" "exists" "true" "false") 'words))
+  "Regular expression for LB Datalog keywords.")
 
 (defconst lb-datalog-types-regexp
   (eval-when-compile
-    (regexp-opt lb-datalog-types 'symbols)))
+    (regexp-opt '("int" "int[8]" "int[16]" "int[32]" "int[64]"
+                  "uint[8]" "uint[16]" "uint[32]" "uint[64]"
+                  "float" "float[32]" "float[64]"
+                  "decimal" "decimal[64]" "decimal[128]"
+                  "boolean" "string" "datetime" "color")
+                'symbols))
+  "Regular expression for LB Datalog types.")
 
 (defconst lb-datalog-number-regexp
   (concat "\\<[[:digit:]]+"
@@ -293,7 +290,6 @@ backward to previous clause."
   "Major mode for editing LB Datalog ..."
   :group 'lb-datalog
 
-  (interactive)
   (kill-all-local-variables)
 
   ;; Select the mode's keymap.
