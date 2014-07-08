@@ -65,7 +65,7 @@
 
 (defconst lb-datalog-keywords-regexp
   (eval-when-compile
-    (regexp-opt '("agg" "not" "exists" "true" "false") 'words))
+    (regexp-opt '("agg" "not" "exists" "true" "false") 'symbols))
   "Regular expression for LB Datalog keywords.")
 
 (defconst lb-datalog-types-regexp
