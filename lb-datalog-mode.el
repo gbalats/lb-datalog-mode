@@ -65,7 +65,7 @@
 
 (defconst lb-datalog-keywords-regexp
   (eval-when-compile
-    (regexp-opt '("agg" "not" "exists" "true" "false") 'symbols))
+    (regexp-opt '("not" "exists" "true" "false") 'symbols))
   "Regular expression for LB Datalog keywords.")
 
 (defconst lb-datalog-types-regexp
@@ -83,6 +83,10 @@
           "\\(?:\\.[[:digit:]]+\\)?"
           "\\(?:[eE][+-]?[[:digit:]]+\\)?\\>")
   "Regular expression for LB Datalog numbers.")
+
+(defconst lb-datalog-aggregation-regexp
+  (concat "\\(agg\\)\\s-*<<.*>>")
+  "Regular expression for LB Datalog aggregations.")
 
 (defconst lb-datalog-stage-modifier-regexp
   (concat "@\\(?:"
@@ -109,6 +113,7 @@
     `((,lb-datalog-types-regexp . font-lock-type-face)
       (,lb-datalog-keywords-regexp . font-lock-keyword-face)
       (,lb-datalog-number-regexp . font-lock-warning-face)
+      (,lb-datalog-aggregation-regexp 1 font-lock-keyword-face)
       (,predicate-ref-regexp . font-lock-reference-face)
       (,builtin-predicate-regexp . font-lock-builtin-face)
       (,staged-predicate-regexp (1 lb-datalog-predicate-face)
