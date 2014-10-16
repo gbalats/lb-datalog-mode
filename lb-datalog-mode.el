@@ -307,6 +307,7 @@ is no effect."
 ;; define the mode
 ;;----------------------------
 
+;;;###autoload
 (define-derived-mode lb-datalog-mode prog-mode "lb-datalog mode"
   "Major mode for editing LB Datalog ..."
   :group 'lb-datalog
