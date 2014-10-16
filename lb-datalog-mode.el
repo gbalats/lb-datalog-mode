@@ -12,9 +12,6 @@
 
 ;;; Code:
 
-(provide 'lb-datalog-mode)
-
-
 ;;----------------------------
 ;; Prerequisites
 ;;----------------------------
@@ -326,3 +323,8 @@ backward to previous clause."
 ;;----------------------------
 
 (add-to-list 'auto-mode-alist '("\\.logic$" . lb-datalog-mode))
+
+
+(provide 'lb-datalog-mode)
+
+;;; lb-datalog-mode.el ends here
