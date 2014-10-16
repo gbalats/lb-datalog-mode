@@ -244,6 +244,25 @@ backward to previous clause."
     (setq arg (1+ arg))))
 
 
+(defun lb-datalog-mark-clause ()
+  "Marks one clause, surrounding point.
+
+Intended for use with `expand-region' as an element of
+`er/try-expand-list'. If the point is not inside a clause, there
+is no effect."
+  (interactive)
+  (let ((orig-point (point)))
+    (forward-char 1)
+    (lb-datalog-backward-clause 1)      ; move to clause beginning
+    (set-mark (point))
+    (lb-datalog-forward-clause 1)       ; move to clause ending
+    (exchange-point-and-mark)
+    (when (or (< orig-point (point))    ; undo effects if not inside clause
+              (> orig-point (mark)))
+      (pop-mark)
+      (goto-char orig-point))))
+
+
 ;;----------------------------
 ;; syntax table
 ;;----------------------------
