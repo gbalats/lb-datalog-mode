@@ -47,6 +47,7 @@
 (require 'newcomment)
 (require 'smie)
 (eval-when-compile
+  (require 'compile)
   (require 'regexp-opt))
 
 
@@ -81,6 +82,15 @@
 
 (defvar lb-datalog-electric-newline-p t
   "*Non-nil means automatically indent the next line when the user types RET.")
+
+(defvar lb-compilation-error-regexp-alist
+  (eval-when-compile
+    `(,(concat "^"
+               "File \\(.+\\) (Block .+) : "
+               "Line \\([0-9]+\\), Columns \\([0-9]+\\)-\\([0-9]+\\):"
+               "$")
+      (1 "%s.logic") 2 (3 . 4) nil 1))
+  "Compilation error regexp-alist for `lb-datalog-mode' buffers.")
 
 
 ;;----------------------------
@@ -345,6 +355,14 @@ backward to previous clause."
   ;; permit the user to customize the mode with a hook
   (run-mode-hooks 'lb-datalog-mode-hook))
 
+
+;;----------------------------
+;; Add compilation hook
+;;----------------------------
+
+(add-hook 'compilation-mode-hook
+          (lambda () (add-to-list 'compilation-error-regexp-alist
+                                  lb-compilation-error-regexp-alist)))
 
 ;;----------------------------
 ;; Add file association
