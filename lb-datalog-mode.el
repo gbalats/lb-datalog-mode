@@ -43,6 +43,7 @@
 ;; Prerequisites
 ;;----------------------------
 
+(require 'f)
 (require 'font-lock)
 (require 'newcomment)
 (require 'smie)
@@ -279,6 +280,16 @@ backward to previous clause."
     (skip-chars-forward "[:space:]")    ; skip spaces
     (lb-datalog-forward-comment 1)      ; skip comments
     (setq arg (1+ arg))))
+
+
+;;----------------------------
+;; Project management
+;;----------------------------
+
+(defun lb-datalog-find-project-file (&optional path)
+  (let* ((pattern "*.project")
+         (top-dir (f--traverse-upwards (f-glob pattern it) path)))
+    (when top-dir (car (f-glob pattern top-dir)))))
 
 
 ;;----------------------------
