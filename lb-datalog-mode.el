@@ -286,10 +286,16 @@ backward to previous clause."
 ;; Project management
 ;;----------------------------
 
+;;;###autoload
 (defun lb-datalog-find-project-file (&optional path)
   (let* ((pattern "*.project")
-         (top-dir (f--traverse-upwards (f-glob pattern it) path)))
-    (when top-dir (car (f-glob pattern top-dir)))))
+         (top-directory (f--traverse-upwards (f-glob pattern it) path))
+         (project-files (and top-directory (f-glob pattern top-directory))))
+    (unless project-files
+      (error "No project file"))
+    (unless (= 1 (length project-files))
+      (error "Multiple project files: %s" project-files))
+    (car project-files)))
 
 
 ;;----------------------------
