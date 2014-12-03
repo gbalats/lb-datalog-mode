@@ -86,13 +86,59 @@
 (defvar lb-datalog-electric-newline-p t
   "*Non-nil means automatically indent the next line when the user types RET.")
 
-(defvar lb-compilation-error-regexp-alist
+(defconst lb-datalog-compiler "bloxcompiler"
+  "The compiler command for LB Datalog files and projects.")
+
+(defun lb-datalog--block-regexp-to-filename ()
+  (let ((block-regexp (match-string 1))
+        (command compile-command))
+    ;; Search backwards for bloxcompiler line. This is helpful if the
+    ;; compilation command is invoking another tool that calls
+    ;; bloxcompiler in turn.
+    (if (not (s-starts-with? lb-datalog-compiler command))
+        (save-match-data
+          (save-excursion
+            (if (word-search-backward "bloxcompiler" nil t)
+                (setq command (thing-at-point 'line))))))
+    (let* ((project-file
+            (car (s-match "\\<[^[[:space:]]*\\.project\\>" command))))
+      (f-join compilation-directory
+              (concat block-regexp ".logic")))))
+
+(defvar lb-compilation-error-regexp-alist1
   (eval-when-compile
     `(,(concat "^"
                "File \\(.+\\) (Block .+) : "
                "Line \\([0-9]+\\), Columns \\([0-9]+\\)-\\([0-9]+\\):"
                "$")
       (1 "%s.logic") 2 (3 . 4) nil 1))
+  "Compilation error regexp-alist for `lb-datalog-mode' buffers.")
+
+(defvar lb-compilation-error-regexp-alist2
+  (eval-when-compile
+    `(,(concat "^"
+               "File \\(.+\\) (Block .+) : "
+               "Line \\([0-9]+\\), Column \\([0-9]+\\):"
+               ".*$")
+      (1 "%s.logic") 2 3 nil 1))
+  "Compilation error regexp-alist for `lb-datalog-mode' buffers.")
+
+(defvar lb-compilation-error-regexp-alist3
+  (eval-when-compile
+    `(,(concat "^"
+               "Block \\(.+\\): "
+               "Line \\([0-9]+\\), Columns \\([0-9]+\\)-\\([0-9]+\\):"
+               ".*$")
+      lb-datalog--block-regexp-to-filename 2 (3 . 4) nil 1))
+  "Compilation error regexp-alist for `lb-datalog-mode' buffers.")
+
+(defvar lb-compilation-error-regexp-alist4
+  (eval-when-compile
+    `(,(concat "^"
+               "Block \\(.+\\): "
+               "Line \\([0-9]+\\), Column \\([0-9]+\\):"
+               ".*$")
+      lb-datalog--block-regexp-to-filename 2 3 nil 1))
   "Compilation error regexp-alist for `lb-datalog-mode' buffers.")
 
 
@@ -401,9 +447,16 @@ logic files: (lb-datalog-logic-files 'inactive)."
 ;; Add compilation hook
 ;;----------------------------
 
-(add-hook 'compilation-mode-hook
-          (lambda () (add-to-list 'compilation-error-regexp-alist
-                                  lb-compilation-error-regexp-alist)))
+
+(add-hook
+ 'compilation-mode-hook
+ (lambda ()
+   (dolist (error-regexp (list lb-compilation-error-regexp-alist1
+                               lb-compilation-error-regexp-alist2
+                               lb-compilation-error-regexp-alist3
+                               lb-compilation-error-regexp-alist4))
+     (add-to-list 'compilation-error-regexp-alist error-regexp))))
+
 
 ;;----------------------------
 ;; Add file association
