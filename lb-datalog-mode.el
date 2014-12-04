@@ -182,8 +182,8 @@
   "Regular expression for LB Datalog stage modifiers.")
 
 (defvar lb-datalog-font-lock-keywords
-  (let* ((variable-regexp "[[:alpha:]_?][[:word:]_]*")
-         (predicate-name-regexp "\\sw+\\(?:[:_?$]\\sw+\\)*")
+  (let* ((variable-regexp "[_?[:alpha:]][_[:word:]]*")
+         (predicate-name-regexp "[_[:alpha:]][_:?$[:word:]]*")
          (predicate-ref-regexp (concat "`" predicate-name-regexp))
          (builtin-predicate-regexp (concat "\\_<lang:" predicate-name-regexp))
          (predicate-regexp
@@ -195,13 +195,13 @@
                   "\\s(.*?\\s)")))      ; non-greedy *? operator inside paren
     `((,lb-datalog-types-regexp . font-lock-type-face)
       (,lb-datalog-keywords-regexp . font-lock-keyword-face)
-      (,lb-datalog-number-regexp . font-lock-warning-face)
       (,lb-datalog-aggregation-regexp 1 font-lock-keyword-face)
       (,predicate-ref-regexp . font-lock-reference-face)
       (,builtin-predicate-regexp . font-lock-builtin-face)
       (,staged-predicate-regexp (1 lb-datalog-predicate-face)
                                 (2 font-lock-builtin-face))
       (,predicate-regexp 1 lb-datalog-predicate-face)
+      (,lb-datalog-number-regexp . font-lock-warning-face)
       (,variable-regexp . font-lock-variable-name-face)))
   "Font-lock keywords for `lb-datalog-mode'.")
 
