@@ -215,10 +215,11 @@
 ;;    (smie-bnf->prec2
 ;;     '((id)
 ;;       (clause (atoms "<-" atoms ".")
+;;               (atoms "<-" "agg" "<<" exp "=" atom ">>" atoms ".")
 ;;               (atoms "->" atoms ".")
 ;;               (atoms "."))
 ;;       (atom (pred "(" exps ")")
-;;             (pred "[" exps "]" = exp))
+;;             (pred "[" exps "]" "=" exp))
 ;;       (atoms (atoms "," atoms)
 ;;              (atoms ";" atoms)
 ;;              ("!" atom)
