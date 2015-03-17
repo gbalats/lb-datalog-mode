@@ -415,9 +415,9 @@ logic files: (lb-datalog-logic-files 'inactive)."
 (defvar lb-datalog-mode-map
   (let ((map (make-sparse-keymap)))
     ;; modify the keymap
-    (define-key map "\M-e" 'lb-datalog-forward-clause)
-    (define-key map "\M-a" 'lb-datalog-backward-clause)
     (define-key map (kbd "C-c :") 'lb-datalog-rename-symbol)
+    (define-key map (kbd "M-e") 'lb-datalog-forward-clause)
+    (define-key map (kbd "M-a") 'lb-datalog-backward-clause)
     (define-key map [remap comment-dwim] 'lb-datalog-comment-dwim)
     (when lb-datalog-electric-newline-p
       (define-key map "\r" 'reindent-then-newline-and-indent))
