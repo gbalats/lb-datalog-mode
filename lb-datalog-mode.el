@@ -6,7 +6,8 @@
 ;; Maintainer: George Balatsouras <gbalats(at)gmail(dot)com>
 ;; Created: 26 Aug 2014
 ;; Keywords: convenience, languages
-
+;; Version: 0.1.0
+;; Package-Requires: ((s "1.6.0") (f "0.17.1") (dash "1.5.0") (pkg-info "0.4"))
 ;;
 ;; This file is NOT part of Emacs.
 ;;
