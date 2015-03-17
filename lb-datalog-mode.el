@@ -368,6 +368,29 @@ logic files: (lb-datalog-logic-files 'inactive)."
             (--map (-map 's-trim (s-split-up-to "," it 2))
                    (s-lines (f-read-bytes project-file))))))
 
+
+;;----------------------------
+;; refactorings
+;;----------------------------
+
+(defun lb-datalog-narrow-to-clause ()
+  (save-excursion
+    (lb-datalog-forward-clause 1)       ; move to clause ending
+      (set-mark (point))
+      (lb-datalog-backward-clause 1)      ; move to clause beginning
+      (deactivate-mark)
+      (narrow-to-region (point) (mark))))
+
+(defun lb-datalog-rename-symbol ()
+  (interactive)
+  (save-restriction
+    (lb-datalog-narrow-to-clause)
+    (mc/mark-all-symbols-like-this)))
+
+(add-to-list 'mc--default-cmds-to-run-once
+             'lb-datalog-rename-symbol)
+
+
 ;;----------------------------
 ;; syntax table
 ;;----------------------------
@@ -393,6 +416,7 @@ logic files: (lb-datalog-logic-files 'inactive)."
     ;; modify the keymap
     (define-key map "\M-e" 'lb-datalog-forward-clause)
     (define-key map "\M-a" 'lb-datalog-backward-clause)
+    (define-key map (kbd "C-c :") 'lb-datalog-rename-symbol)
     (define-key map [remap comment-dwim] 'lb-datalog-comment-dwim)
     (when lb-datalog-electric-newline-p
       (define-key map "\r" 'reindent-then-newline-and-indent))
