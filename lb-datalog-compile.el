@@ -1,4 +1,4 @@
-;;; lb-datalog-mode-compile.el -- LB Datalog compilation buffer support
+;;; lb-datalog-compile.el -- LB Datalog compilation buffer support
 
 ;; Copyright (C) 2014, George Balatsouras
 ;;
@@ -111,6 +111,6 @@ This corresponds to the regular expression which captures the block name."
                                lb-compilation-error-regexp-alist4))
      (add-to-list 'compilation-error-regexp-alist error-regexp))))
 
-(provide 'lb-datalog-mode-compile)
+(provide 'lb-datalog-compile)
 
-;;; lb-datalog-mode-compile.el ends here
+;;; lb-datalog-compile.el ends here

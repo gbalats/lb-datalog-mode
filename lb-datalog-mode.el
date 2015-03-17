@@ -54,7 +54,7 @@
   (require 'regexp-opt))
 
 
-(require 'lb-datalog-mode-compile)
+(require 'lb-datalog-compile)
 
 ;;----------------------------
 ;; Local variables
