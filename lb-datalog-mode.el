@@ -381,6 +381,7 @@ logic files: (lb-datalog-logic-files 'inactive)."
       (deactivate-mark)
       (narrow-to-region (point) (mark))))
 
+;;;###autoload
 (defun lb-datalog-rename-symbol ()
   (interactive)
   (save-restriction
