@@ -317,6 +317,27 @@ logic files: (lb-datalog-logic-files 'inactive)."
             (--map (-map 's-trim (s-split-up-to "," it 2))
                    (s-lines (f-read-bytes project-file))))))
 
+(defun add-to-project-hook ()
+  (when (eq major-mode 'lb-datalog-mode)
+    (let ((project-file (ignore-errors (lb-datalog-find-project-file)))
+          (saved-file   (buffer-file-name)))
+      (when project-file
+        (let ((project-files (lb-datalog-logic-files))
+              (rel-saved-file (f-relative saved-file
+                                          (f-dirname project-file))))
+          (when (and (f-ext? saved-file "logic")
+                     (not (member saved-file project-files)))
+            (if (y-or-n-p (format "Add file %s to project file %s?"
+                                  rel-saved-file
+                                  (f-relative project-file)))
+                (progn
+                  (message "Adding %s" rel-saved-file)
+                  (write-region (s-concat "\n" rel-saved-file ", active\n")
+                                nil project-file 'append))
+              (message ""))))))))
+
+(add-hook 'after-save-hook 'add-to-project-hook)
+
 
 ;;----------------------------
 ;; refactorings
