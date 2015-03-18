@@ -325,10 +325,10 @@ logic files: (lb-datalog-logic-files 'inactive)."
 (defun lb-datalog-narrow-to-clause ()
   (save-excursion
     (lb-datalog-forward-clause 1)       ; move to clause ending
-      (set-mark (point))
-      (lb-datalog-backward-clause 1)      ; move to clause beginning
-      (deactivate-mark)
-      (narrow-to-region (point) (mark))))
+    (set-mark (point))
+    (lb-datalog-backward-clause 1)      ; move to clause beginning
+    (deactivate-mark)
+    (narrow-to-region (point) (mark))))
 
 ;;;###autoload
 (defun lb-datalog-rename-symbol ()
