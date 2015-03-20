@@ -105,24 +105,33 @@ The path to project file is bound to VAR."
 (defun lb-datalog-add-to-project-hook ()
   "Add visiting file to project."
   (lb-datalog-with-project
-   (let* ((saved-file     (buffer-file-name))
+   (let* ((project-file   lb-datalog-project-file)
+          (saved-file     (buffer-file-name))
           (project-files  (lb-datalog-logic-files))
           (rel-saved-file (f-relative saved-file
-                                      (f-dirname lb-datalog-project-file))))
+                                      (f-dirname project-file))))
      (when (and (f-ext? saved-file "logic")
                 (not (member saved-file project-files)))
        (if (y-or-n-p (format "Add to %s? "
-                             (f-relative lb-datalog-project-file)))
+                             (f-relative project-file)))
            (let* ((choice
                    (read-char-choice
                     "Mark as (a)ctive or (i)nactive? " '(?a ?i)))
                   (type
                    (if (char-equal ?a choice) "active" "inactive")))
              (message "Adding %s as %s" rel-saved-file type)
-             (write-region
-              (s-concat "\n" rel-saved-file ", " type "\n")
-              nil lb-datalog-project-file 'append))
+             ;; Add to project file contents
+             (with-current-buffer (find-file-noselect project-file)
+               (save-excursion
+                 (goto-char (point-max))
+                 ;; insert newline if needed
+                 (unless (char-equal ?\n (char-before))
+                   (insert-char ?\n))
+                 ;; insert new entry
+                 (insert rel-saved-file ", " type ?\n)
+                 (basic-save-buffer))))
          (message ""))))))
+
 
 (add-hook 'after-save-hook
           'lb-datalog-add-to-project-hook)
