@@ -98,7 +98,6 @@ The path to project file is bound to VAR."
      (setq lb-datalog-project-file
            (ignore-errors
              (lb-datalog-find-project-file)))
-     (message "Reached")
      (when lb-datalog-project-file
        ,@body)))
 
