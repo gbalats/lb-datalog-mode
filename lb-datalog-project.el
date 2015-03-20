@@ -38,6 +38,13 @@
 (require 's)
 
 
+(defvar-local lb-datalog-project-file nil
+  "The absolute path to the project file.
+
+You should only use this variable inside an
+`lb-datalog-with-project' macro.")
+
+
 ;;----------------------------
 ;; Project File and Contents
 ;;----------------------------
@@ -77,30 +84,42 @@ logic files: (lb-datalog-logic-files 'inactive)."
                  (s-ends-with? ".logic" (car it))
                  (s-match type-regexp (cadr it))
                  (f-join (f-dirname project-file) (car it)))
+            ;; Parse project contents
             (--map (-map 's-trim (s-split-up-to "," it 2))
                    (s-lines (f-read-bytes project-file))))))
 
 
+(defmacro lb-datalog-with-project (&rest body)
+  "Execute BODY only when inside a project.
+The path to project file is bound to VAR."
+  (declare (debug ((sexp form) body))
+           (indent 0))
+  `(when (eq major-mode (quote lb-datalog-mode))
+     (setq lb-datalog-project-file
+           (ignore-errors
+             (lb-datalog-find-project-file)))
+     (message "Reached")
+     (when lb-datalog-project-file
+       ,@body)))
+
+
 (defun lb-datalog-add-to-project-hook ()
   "Add visiting file to project."
-  (when (eq major-mode 'lb-datalog-mode)
-    (let ((project-file (ignore-errors (lb-datalog-find-project-file)))
-          (saved-file   (buffer-file-name)))
-      (when project-file
-        (message "Found project file %s" project-file)
-        (let ((project-files (lb-datalog-logic-files))
-              (rel-saved-file (f-relative saved-file
-                                          (f-dirname project-file))))
-          (when (and (f-ext? saved-file "logic")
-                     (not (member saved-file project-files)))
-            (if (y-or-n-p (format "Add file %s to %s?"
-                                  rel-saved-file
-                                  (f-relative project-file)))
-                (progn
-                  (message "Adding %s" rel-saved-file)
-                  (write-region (s-concat "\n" rel-saved-file ", active\n")
-                                nil project-file 'append))
-              (message ""))))))))
+  (lb-datalog-with-project
+   (let* ((saved-file     (buffer-file-name))
+          (project-files  (lb-datalog-logic-files))
+          (rel-saved-file (f-relative saved-file
+                                      (f-dirname lb-datalog-project-file))))
+     (when (and (f-ext? saved-file "logic")
+                (not (member saved-file project-files)))
+       (if (y-or-n-p (format "Add file %s to %s?"
+                             rel-saved-file
+                             (f-relative lb-datalog-project-file)))
+           (progn
+             (message "Adding %s" rel-saved-file)
+             (write-region (s-concat "\n" rel-saved-file ", active\n")
+                           nil lb-datalog-project-file 'append))
+         (message ""))))))
 
 (add-hook 'after-save-hook
           'lb-datalog-add-to-project-hook)
