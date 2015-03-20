@@ -113,10 +113,15 @@ The path to project file is bound to VAR."
                 (not (member saved-file project-files)))
        (if (y-or-n-p (format "Add to %s? "
                              (f-relative lb-datalog-project-file)))
-           (progn
-             (message "Adding %s" rel-saved-file)
-             (write-region (s-concat "\n" rel-saved-file ", active\n")
-                           nil lb-datalog-project-file 'append))
+           (let* ((choice
+                   (read-char-choice
+                    "Mark as (a)ctive or (i)nactive? " '(?a ?i)))
+                  (type
+                   (if (char-equal ?a choice) "active" "inactive")))
+             (message "Adding %s as %s" rel-saved-file type)
+             (write-region
+              (s-concat "\n" rel-saved-file ", " type "\n")
+              nil lb-datalog-project-file 'append))
          (message ""))))))
 
 (add-hook 'after-save-hook
