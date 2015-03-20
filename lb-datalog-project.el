@@ -111,8 +111,7 @@ The path to project file is bound to VAR."
                                       (f-dirname lb-datalog-project-file))))
      (when (and (f-ext? saved-file "logic")
                 (not (member saved-file project-files)))
-       (if (y-or-n-p (format "Add file %s to %s?"
-                             rel-saved-file
+       (if (y-or-n-p (format "Add to %s? "
                              (f-relative lb-datalog-project-file)))
            (progn
              (message "Adding %s" rel-saved-file)
