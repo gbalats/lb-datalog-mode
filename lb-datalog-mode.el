@@ -1,17 +1,18 @@
-;;; lb-datalog-mode.el --- major mode for editing Datalog code
+;;; lb-datalog-mode.el --- Major mode for editing Datalog code
 
 ;; Copyright (C) 2014, George Balatsouras
 ;;
 ;; Author: George Balatsouras <gbalats(at)gmail(dot)com>
 ;; Maintainer: George Balatsouras <gbalats(at)gmail(dot)com>
 ;; Created: 26 Aug 2014
+;; Version: 0.2
 ;; Keywords: convenience, languages
 ;;
 ;; This file is NOT part of Emacs.
 ;;
 ;; This program is free software; you can redistribute it and/or
 ;; modify it under the terms of the GNU General Public License as
-;; published by the Free Software Foundation; either version 2 of
+;; published by the Free Software Foundation; either version 3 of
 ;; the License, or (at your option) any later version.
 ;;
 ;; This program is distributed in the hope that it will be

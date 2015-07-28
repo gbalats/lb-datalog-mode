@@ -1,15 +1,9 @@
-;;; lb-datalog-mode-pkg.el --- define lb-datalog-mode for package.el
-
-(define-package "lb-datalog-mode" "0.1.1"
-  "LB Datalog major mode"
-  '((emacs "24")
-    (s "1.6.0")
-    (dash "1.5.0")
-    (f "0.17.1")
-    (multiple-cursors "1.0.0")
+(define-package "lb-datalog-mode" "0.2" "Major mode for editing Datalog code"
+  '((cl-lib "0.5")
+    (expand-region "0.8")
     (pkg-info "0.4")
-    (cl-lib "0.5")))
-
-;; Local Variables:
-;; no-byte-compile: t
-;; End:
+    (multiple-cursors "1.0.0")
+    (f "0.17.1")
+    (dash "1.5.0")
+    (s "1.6.0")
+    (emacs "24")))
