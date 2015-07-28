@@ -1,0 +1,6 @@
+# -*- mode: snippet; require-final-newline: nil -*-
+# name: entity insertion with refmode
+# key: +ent
+# binding: direct-keybinding
+# --
++${1:Entity}(${3:?p}), +$1:${2:Value}($3:${4:$3ref})$0
