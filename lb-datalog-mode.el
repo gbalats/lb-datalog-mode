@@ -57,6 +57,7 @@
 
 (require 'lb-datalog-compile)
 (require 'lb-datalog-project)
+(require 'lb-datalog-connect)
 
 ;;----------------------------
 ;; Local variables
