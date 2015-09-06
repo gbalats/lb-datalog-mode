@@ -7,6 +7,8 @@ DISTDIR := dist
 project         := lb-datalog-mode
 project_version := $(shell $(CASK) version)
 project_pkgdir  := $(shell $(CASK) package-directory)
+project_sources := $(patsubst %,lb-datalog-%.el,connect compile project mode mode-expansions)
+project_include := $(addprefix -l , $(project_sources))
 
 export EMACS
 
@@ -19,7 +21,7 @@ compile: deps
 	$(CASK) build
 
 run:
-	$(CASKED_EMACS) -Q -l $(project).el
+	$(CASKED_EMACS) -Q $(project_include)
 
 
 # Cleaning targets
