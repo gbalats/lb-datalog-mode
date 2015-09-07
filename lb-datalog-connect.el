@@ -67,21 +67,33 @@ The PATH is then stored to the `lb-datalog-workspace' variable."
 ;; Command line interface
 ;;--------------------------
 
+(defun lb-datalog-run-command (&rest command-args)
+  "Run command with given COMMAND-ARGS.
+Return a buffer that contains the output."
+  (lb-datalog-with-env
+    (let ((output-buffer (generate-new-buffer "*LB Datalog*"))
+          (command (format "%s %s" lb-datalog-cli (s-join " " command-args))))
+      (message "Running: %s" command)
+      (with-current-buffer output-buffer
+        (insert (propertize (format "%s\n\n" command)
+                            'face 'bold)))
+      (apply 'start-process
+             (append (list "LB Datalog" output-buffer lb-datalog-cli)
+                     command-args))
+      (display-buffer output-buffer)
+      output-buffer)))
+
 (defun lb-datalog-create-workspace (&optional path)
   "Create a new workspace at PATH."
   (unless path
     (setq path lb-datalog-workspace))
-  (lb-datalog-with-env
-    (apply 'call-process lb-datalog-cli nil nil nil
-           (list "-db" path "-create" "-overwrite"))))
+  (lb-datalog-run-command "-db" (f-full path) "-create" "-overwrite"))
 
 (defun lb-datalog-add-to-workspace (code &optional path)
   "Add CODE to workspace residing at PATH."
   (unless path
     (setq path lb-datalog-workspace))
-  (lb-datalog-with-env
-    (apply 'call-process lb-datalog-cli nil nil nil
-           (list "-db" path "-addBlock" code))))
+  (lb-datalog-run-command "-db" (f-full path) "-addBlock" code))
 
 ;;------------------------
 ;; Interactive commands
@@ -109,7 +121,6 @@ position FROM and TO."
     (call-interactively 'lb-datalog-connect))
   ;; Add block of code
   (let ((code-string (buffer-substring-no-properties from to)))
-    (message "Adding logic: %s" code-string)
     (lb-datalog-add-to-workspace code-string)))
 
 (provide 'lb-datalog-connect)
