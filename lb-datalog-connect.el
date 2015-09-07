@@ -32,6 +32,24 @@
 
 ;;; Code:
 
+(require 'f)
+(require 's)
+(require 'lb-datalog-core)
+
+(defcustom lb-datalog-cli "bloxbatch"
+    "Return the name of the LB command line utility.
+If the command is not on your path, you may specify a fully
+qualified path to it."
+    :tag "LB command line utility"
+    :group 'lb-datalog
+    :type 'string)
+
+(defmacro lb-datalog-with-env (&rest body)
+  "Ensure command environment is set before executing BODY."
+  (declare (indent 0) (debug t))
+  `(if (executable-find lb-datalog-cli)
+       ,@body
+     (user-error "Executable `%s' is missing" lb-datalog-cli)))
 
 (defvar lb-datalog-workspace
   nil
@@ -44,6 +62,55 @@ The PATH is then stored to the `lb-datalog-workspace' variable."
   (interactive "DConnect to workspace: ")
   (setq lb-datalog-workspace path))
 
+
+;;--------------------------
+;; Command line interface
+;;--------------------------
+
+(defun lb-datalog-create-workspace (&optional path)
+  "Create a new workspace at PATH."
+  (unless path
+    (setq path lb-datalog-workspace))
+  (lb-datalog-with-env
+    (apply 'call-process lb-datalog-cli nil nil nil
+           (list "-db" path "-create" "-overwrite"))))
+
+(defun lb-datalog-add-to-workspace (code &optional path)
+  "Add CODE to workspace residing at PATH."
+  (unless path
+    (setq path lb-datalog-workspace))
+  (lb-datalog-with-env
+    (apply 'call-process lb-datalog-cli nil nil nil
+           (list "-db" path "-addBlock" code))))
+
+;;------------------------
+;; Interactive commands
+;;------------------------
+
+;;;###autoload
+(defun lb-datalog-add-block (&optional from to)
+  "Add some logic to active workspace.
+When called interactively, add current clause or text selection.
+
+When called in LISP code, add the code in the region between
+position FROM and TO."
+  (interactive
+   (if (use-region-p)
+       (list (region-beginning) (region-end))
+     (save-excursion
+       (forward-char 1)
+       (lb-datalog-backward-clause 1)
+       (setq from (point))
+       (lb-datalog-forward-clause 1)
+       (setq to (point))
+       (list from to))))
+  ;; Connect to workspace
+  (unless lb-datalog-workspace
+    (call-interactively 'lb-datalog-connect))
+  ;; Add block of code
+  (let ((code-string (buffer-substring-no-properties from to)))
+    (message "Adding logic: %s" code-string)
+    (lb-datalog-add-to-workspace code-string)))
 
 (provide 'lb-datalog-connect)
 

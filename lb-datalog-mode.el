@@ -55,6 +55,7 @@
   (require 'regexp-opt))
 
 
+(require 'lb-datalog-core)
 (require 'lb-datalog-compile)
 (require 'lb-datalog-project)
 (require 'lb-datalog-connect)
@@ -62,11 +63,6 @@
 ;;----------------------------
 ;; Local variables
 ;;----------------------------
-
-(defgroup lb-datalog nil
-  "Major mode `lb-datalog-mode' for editing LB Datalog code."
-  :prefix "lb-datalog-"
-  :group  'languages)
 
 (defcustom lb-datalog-default-face 'default
   "Default face in `lb-datalog-mode' buffers."
@@ -229,57 +225,6 @@ For detail, see `comment-dwim'."
   (interactive "*P")
   (let ((comment-start "//") (comment-end ""))
     (comment-dwim arg)))
-
-
-;; command to bypass comment
-(defun lb-datalog-forward-comment (&optional direction)
-  "LB Datalog mode specific version of `forward-comment'.
-Optional argument DIRECTION defines the direction to move to."
-  (let ((comment-start "//")
-        (factor (if (< (or direction 0) 0) -99999 99999)))
-    (forward-comment factor)))
-
-
-;;----------------------------
-;; Movement by clauses
-;;----------------------------
-
-(defun lb-datalog-backward-clause (&optional arg)
-  "Move backward to previous clause.
-With ARG, repeat.  See `lb-datalog-forward-clause'."
-  (interactive "^p")
-  (or arg (setq arg 1))
-  (lb-datalog-forward-clause (- arg)))
-
-(defun lb-datalog-forward-clause (&optional arg)
-  "Move forward to the next clause.
-With ARG, repeat.  With negative argument, move ARG times
-backward to previous clause."
-  (interactive "^p")
-  (or arg (setq arg 1))
-  ;; moving forward
-  (while (> arg 0)
-    (lb-datalog-forward-comment 1)      ; bypass comment
-    (while                              ; search for dot
-        (progn
-          (re-search-forward "\\." nil t 1)
-          (nth 8 (syntax-ppss))))       ; while ignoring those inside
-                                        ; comments or strings
-    (setq arg (1- arg)))
-  ;; moving backwards
-  (while (< arg 0)
-    (lb-datalog-forward-comment -1)     ; bypass backward comment
-    (backward-char)
-    (while                              ; search for previous dot
-        (progn
-          (re-search-backward "\\`\\|\\." nil t 1)
-          (nth 8 (syntax-ppss))))       ; while ignoring those inside
-                                        ; comments or strings
-    (if (= (char-after) ?\.)
-        (forward-char))
-    (skip-chars-forward "[:space:]")    ; skip spaces
-    (lb-datalog-forward-comment 1)      ; skip comments
-    (setq arg (1+ arg))))
 
 
 ;;----------------------------

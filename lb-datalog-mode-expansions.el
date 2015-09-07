@@ -42,7 +42,7 @@
 ;;; Code:
 
 
-(require 'lb-datalog-mode)
+(require 'lb-datalog-core)
 (require 'expand-region-core)
 
 
