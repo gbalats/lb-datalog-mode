@@ -1,0 +1,6 @@
+# -*- mode: snippet; require-final-newline: nil -*-
+# name: int type of 64 bits
+# key: int
+# binding: direct-keybinding
+# --
+int[64](${1:n})$0
