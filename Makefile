@@ -39,7 +39,7 @@ clean-deps:
 	rm -rf .cask/
 
 dist:
-	$(CASK) package $(DISTDIR)
+	$(CASK) package # $(DISTDIR)
 
 .PHONY: all compile run \
 	clean clean-deps clean-elc clean-dist \
