@@ -207,6 +207,10 @@
   (pcase (cons kind token)
     (`(:elem . basic) lb-datalog-indent-width)
     (`(:after . ".") '(column . 0)) ; To work around smie-closer-alist.
+    (`(:before . ",")
+     (when (smie-rule-bolp)
+       (cond ((smie-rule-parent-p "<-" "->") (smie-rule-parent 0))
+             ((not (smie-rule-sibling-p)) (smie-rule-parent 1)))))
     (`(,_ . ,(or `"," `";")) (smie-rule-separator kind))
     (`(:before . ,(or `"<-" `"->"))
      (when (smie-rule-bolp) (smie-rule-parent 1)))
