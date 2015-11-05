@@ -1,0 +1,8 @@
+# -*- mode: snippet; require-final-newline: t -*-
+# name: entity constructor
+# key: by
+# --
+${1:entity}:${2:by_id$(replace-regexp-in-string "[ \t\n\r]+" "_" yas-text)}[${3:Key$(capitalize yas-text)}] = ${4:${1:$(capitalize yas-text)}$(capitalize yas-text)} ->
+   ${5:string}($3), $1($4).
+
+lang:constructor(`$1:$2).
