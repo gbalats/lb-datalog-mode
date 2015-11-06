@@ -1,0 +1,5 @@
+# -*- mode: snippet; require-final-newline: nil -*-
+# name: functional clause
+# binding: C-c C-f
+# --
+${1:predicate$(replace-regexp-in-string "[ \t\n\r]+" "_" yas-text)}[${2:Key}] = ${3:Value}
