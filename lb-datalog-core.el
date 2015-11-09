@@ -114,10 +114,6 @@ backward to previous clause."
         ((looking-back "<-")    (backward-char 2))))
 
 
-;; (defun lb-datalog--search-forward (regexp &optional bound count)
-;;   "Search forward while ignoring strings and comments"
-;;   (re-search-backward regexp bound t))
-
 (defun lb-datalog-backward-atom (&optional arg)
   "Move backward to previous atom.
 With ARG, repeat.  See `lb-datalog-forward-atom'."
