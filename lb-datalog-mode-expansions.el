@@ -86,8 +86,9 @@ is no effect."
 (defun er/add-lb-datalog-mode-expansions ()
   "Add LB Datalog specific expansions for buffers in `lb-datalog-mode."
   (set (make-local-variable 'er/try-expand-list)
-       (append er/try-expand-list '(lb-datalog-mark-atom
-                                    lb-datalog-mark-clause))))
+       (append er/try-expand-list
+               '(lb-datalog-mark-atom
+                 lb-datalog-mark-clause))))
 
 
 ;; add expansions to mode hook
