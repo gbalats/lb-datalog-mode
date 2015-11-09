@@ -92,6 +92,96 @@ backward to previous clause."
     (setq arg (1+ arg))))
 
 
+;;----------------------------
+;; Movement by atoms
+;;----------------------------
+
+
+(defun lb-datalog--skip-delim-forward ()
+  "Move forward past one atom delimiter."
+  (cond ((eq (char-after) ?\.) (forward-char))
+        ((eq (char-after) ?\,) (forward-char))
+        ((eq (char-after) ?\;) (forward-char))
+        ((looking-at "->")     (forward-char 2))
+        ((looking-at "<-")     (forward-char 2))))
+
+(defun lb-datalog--skip-delim-backward ()
+  "Move backwards before one atom delimiter."
+  (cond ((eq (char-before) ?\.) (backward-char))
+        ((eq (char-before) ?\,) (backward-char))
+        ((eq (char-before) ?\;) (backward-char))
+        ((looking-back "->")    (backward-char 2))
+        ((looking-back "<-")    (backward-char 2))))
+
+
+;; (defun lb-datalog--search-forward (regexp &optional bound count)
+;;   "Search forward while ignoring strings and comments"
+;;   (re-search-backward regexp bound t))
+
+(defun lb-datalog-backward-atom (&optional arg)
+  "Move backward to previous atom.
+With ARG, repeat.  See `lb-datalog-forward-atom'."
+  (interactive "^p")
+  (or arg (setq arg 1))
+  ;; moving backwards
+  (catch 'break
+    (while (> arg 0)
+      ;; Move backwards to bypass the previous delimiter
+      (lb-datalog-forward-comment -1)     ; bypass backward comment
+      (skip-chars-backward "[:space:]")   ; skip spaces
+      (lb-datalog--skip-delim-backward)   ; skip delimiter
+      (while
+          (progn
+            ;; search for previous atom delimiter
+            (unless (re-search-backward ",\\|;\\|\\.\\|->\\|<-" nil 0 1)
+              (lb-datalog-forward-comment 1)
+              (throw 'break nil))
+            ;; check parser state
+            (let ((parser-state (syntax-ppss))) ; break unless
+              (or (nth 8  parser-state)         ; inside comments or strings
+                  (> (car parser-state) 0)))))  ; inside parenthesized group
+      ;; Move forward to reach atom beginning
+      (lb-datalog--skip-delim-forward)      ; skip atom delimiter
+      (skip-chars-forward "[:space:]\\|\n") ; skip spaces
+      (lb-datalog-forward-comment 1)        ; skip comment
+      (setq arg (1- arg))))
+  ;; negative arg means move forward instead
+  (when (< arg 0)
+    (lb-datalog-forward-atom (- arg))))
+
+
+(defun lb-datalog-forward-atom (&optional arg)
+  "Move forward to the next atom.
+With ARG, repeat.  With negative argument, move ARG times
+backward to previous atom."
+  (interactive "^p")
+  (or arg (setq arg 1))
+  ;; moving forward
+  (catch 'break
+    (while (> arg 0)
+      ;; Move forward to bypass the next delimiter
+      (lb-datalog-forward-comment 1)      ; skip any comment
+      (skip-chars-forward "[:space:]")    ; skip spaces
+      (lb-datalog--skip-delim-forward)    ; skip atom delimiter
+      (while
+          (progn
+            ;; search for next atom delimiter
+            (unless (re-search-forward ",\\|;\\|\\.\\|->\\|<-" nil 0 1)
+              (throw 'break nil))
+            ;; check parser state
+            (let ((parser-state (syntax-ppss))) ; break unless
+              (or (nth 8  parser-state)         ; inside comments or strings
+                  (> (car parser-state) 0)))))  ; inside parenthesized group
+      ;; Move backwards to reach the end of the atom
+      (lb-datalog--skip-delim-backward)      ; skip delimiter
+      (skip-chars-backward "[:space:]\\|\n") ; skip spaces
+      (lb-datalog-forward-comment -1)        ; skip any comment
+      (setq arg (1- arg))))
+  ;; negative arg means move backwards instead
+  (when (< arg 0)
+    (lb-datalog-backward-atom (- arg))))
+
+
 (provide 'lb-datalog-core)
 
 ;;; lb-datalog-core.el ends here
