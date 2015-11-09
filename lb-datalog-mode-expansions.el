@@ -64,11 +64,30 @@ is no effect."
       (pop-mark)
       (goto-char orig-point))))
 
+(defun lb-datalog-mark-atom ()
+  "Mark one atom, surrounding point.
+
+Intended for use with `expand-region' as an element of
+`er/try-expand-list'.  If the point is not inside an atom, there
+is no effect."
+  (interactive)
+  (let ((orig-point (point)))
+    (forward-char 1)
+    (lb-datalog-backward-atom 1)        ; move to atom beginning
+    (set-mark (point))
+    (lb-datalog-forward-atom 1)         ; move to atom ending
+    (exchange-point-and-mark)
+    (when (or (< orig-point (point))    ; undo effects if not inside atom
+              (> orig-point (mark)))
+      (pop-mark)
+      (goto-char orig-point))))
+
 
 (defun er/add-lb-datalog-mode-expansions ()
   "Add LB Datalog specific expansions for buffers in `lb-datalog-mode."
   (set (make-local-variable 'er/try-expand-list)
-       (append er/try-expand-list '(lb-datalog-mark-clause))))
+       (append er/try-expand-list '(lb-datalog-mark-atom
+                                    lb-datalog-mark-clause))))
 
 
 ;; add expansions to mode hook
