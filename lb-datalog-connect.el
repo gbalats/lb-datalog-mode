@@ -95,6 +95,13 @@ Return a buffer that contains the output."
     (setq path lb-datalog-workspace))
   (lb-datalog-run-command "-db" (f-full path) "-addBlock" code))
 
+(defun lb-datalog-query-workspace (query-code &optional path)
+  "Run QUERY-CODE for the workspace residing at PATH."
+  (unless path
+    (setq path lb-datalog-workspace))
+  (lb-datalog-run-command "-db" (f-full path) "-query" query-code))
+
+
 ;;------------------------
 ;; Interactive commands
 ;;------------------------
