@@ -46,7 +46,7 @@ qualified path to it."
 
 (defmacro lb-datalog-with-env (&rest body)
   "Ensure command environment is set before executing BODY."
-  (declare (indent 0) (debug t))
+  (declare (indent defun) (debug t))
   `(if (executable-find lb-datalog-cli)
        ,@body
      (user-error "Executable `%s' is missing" lb-datalog-cli)))
@@ -106,6 +106,46 @@ Return a buffer that contains the output."
 ;; Interactive commands
 ;;------------------------
 
+
+(defmacro lb-datalog-with-region-and-ws (start end &rest body)
+  "Select a region from START to END and execute BODY.
+Also connect to workspace before executing BODY, if needed."
+  (declare (indent 2) (debug t))
+  `(progn
+     (unless (or ,start ,end)
+       ;; Try selecting enclosing clause as region
+       (let ((orig-point (point)))
+         (save-excursion
+           (forward-char 1)
+           (lb-datalog-backward-clause 1)
+           (unless (> (point) orig-point)
+             (setq ,start (point)))
+           (lb-datalog-forward-clause 1)
+           (unless (< (point) orig-point)
+             (setq ,end (point))))))
+     (if (not (and ,start ,end))         ; region must be selected
+         (user-error "No active region or clause at point")
+       (unless lb-datalog-workspace      ; connect to workspace
+         (call-interactively 'lb-datalog-connect))
+       ,@body)))
+
+
+;;;###autoload
+(defun lb-datalog-query (&optional from to)
+  "Run some query logic to active workspace.
+When called interactively, add current clause or text selection.
+
+When called in LISP code, add the code in the region between
+position FROM and TO."
+  (interactive
+   (if (use-region-p)
+       (list (region-beginning) (region-end))
+     (list nil nil)))
+  (lb-datalog-with-region-and-ws from to
+    (let ((code-string (buffer-substring-no-properties from to)))
+      (lb-datalog-query-workspace code-string))))
+
+
 ;;;###autoload
 (defun lb-datalog-add-block (&optional from to)
   "Add some logic to active workspace.
@@ -116,19 +156,11 @@ position FROM and TO."
   (interactive
    (if (use-region-p)
        (list (region-beginning) (region-end))
-     (save-excursion
-       (forward-char 1)
-       (lb-datalog-backward-clause 1)
-       (setq from (point))
-       (lb-datalog-forward-clause 1)
-       (setq to (point))
-       (list from to))))
-  ;; Connect to workspace
-  (unless lb-datalog-workspace
-    (call-interactively 'lb-datalog-connect))
-  ;; Add block of code
-  (let ((code-string (buffer-substring-no-properties from to)))
-    (lb-datalog-add-to-workspace code-string)))
+     (list nil nil)))
+  (lb-datalog-with-region-and-ws from to
+    (let ((code-string (buffer-substring-no-properties from to)))
+      (lb-datalog-add-to-workspace code-string))))
+
 
 (provide 'lb-datalog-connect)
 

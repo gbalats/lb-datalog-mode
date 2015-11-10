@@ -278,6 +278,9 @@ For detail, see `comment-dwim'."
   (let ((map (make-sparse-keymap)))
     ;; modify the keymap
     (define-key map (kbd "C-c :") 'lb-datalog-rename-symbol)
+    (define-key map (kbd "C-c C-c") 'lb-datalog-connect)
+    (define-key map (kbd "C-c C-q") 'lb-datalog-query)
+    (define-key map (kbd "C-c C-a") 'lb-datalog-add-block)
     (define-key map (kbd "C-M-e") 'lb-datalog-forward-clause)
     (define-key map (kbd "C-M-a") 'lb-datalog-backward-clause)
     (define-key map (kbd "M-e") 'lb-datalog-forward-atom)
