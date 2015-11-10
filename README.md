@@ -47,10 +47,10 @@ Keyboard Shortcuts
 
 Keyboard shortcut        | Description
 -------------------------|-------------------------------
-<kbd>M-a</kbd>           | Move forward by one atom (either functional or plain).
-<kbd>M-e</kbd>           | Move backwards by one atom  (either functional or plain).
-<kbd>C-M-a</kbd>         | Move forward by one clause.
-<kbd>C-M-e</kbd>         | Move backwards by one clause.
+<kbd>M-a</kbd>           | Move backwards by one atom  (either functional or plain).
+<kbd>M-e</kbd>           | Move forward by one atom (either functional or plain).
+<kbd>C-M-a</kbd>         | Move backwards by one clause.
+<kbd>C-M-e</kbd>         | Move forward by one clause.
 <kbd>C-:</kbd>           | Rename local variable (at clause scope).
 <kbd>C-c C-f</kbd>       | Insert a functional atom at point. This requires [yasnippet][yasnippet] to be installed.
 
