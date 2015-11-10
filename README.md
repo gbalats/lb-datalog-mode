@@ -10,12 +10,15 @@ An Emacs mode for LogicBlox Datalog.
 MIT license (see `LICENSE`)
 
 
-Installation
-------------
+Manual Installation
+-------------------
 
-### Install Cask:
+This project uses the [Cask][cask] project management tool for Emacs.
 
-To install [Cask](https://github.com/cask/cask) simply run:
+
+### Install `Cask`:
+
+To install [Cask][cask] simply run:
 
     curl -fsSL https://raw.githubusercontent.com/cask/cask/master/go | python
 
@@ -53,3 +56,4 @@ Keyboard shortcut        | Description
 
 
 [yasnippet]: https://github.com/capitaomorte/yasnippet/
+[cask]: https://github.com/cask/cask
