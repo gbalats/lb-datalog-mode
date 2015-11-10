@@ -13,9 +13,9 @@ MIT license (see `LICENSE`)
 Installation
 ------------
 
-### Install [Cask](https://github.com/cask/cask):
+### Install Cask:
 
-To install `Cask` simply run:
+To install [Cask](https://github.com/cask/cask) simply run:
 
     curl -fsSL https://raw.githubusercontent.com/cask/cask/master/go | python
 
