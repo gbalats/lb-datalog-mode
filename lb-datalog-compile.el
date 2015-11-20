@@ -64,7 +64,8 @@ This corresponds to the regular expression which captures the block name."
   (eval-when-compile
     `(,(concat "^"
                "File \\(.+\\) (Block .+) : "
-               "Line \\([0-9]+\\), Columns \\([0-9]+\\)-\\([0-9]+\\):"
+               "Line \\([0-9]+\\), "
+               "Columns \\([0-9]+\\)-\\([0-9]+\\):"
                "$")
       (1 "%s.logic") 2 (3 . 4) nil 1))
   "Compilation error regexp-alist for `lb-datalog-mode' buffers.")
@@ -73,7 +74,8 @@ This corresponds to the regular expression which captures the block name."
   (eval-when-compile
     `(,(concat "^"
                "File \\(.+\\) (Block .+) : "
-               "Line \\([0-9]+\\), Column \\([0-9]+\\):"
+               "Line \\([0-9]+\\), "
+               "Column \\([0-9]+\\):"
                ".*$")
       (1 "%s.logic") 2 3 nil 1))
   "Compilation error regexp-alist for `lb-datalog-mode' buffers.")
@@ -82,7 +84,8 @@ This corresponds to the regular expression which captures the block name."
   (eval-when-compile
     `(,(concat "^"
                "Block \\(.+\\): "
-               "Line \\([0-9]+\\), Columns \\([0-9]+\\)-\\([0-9]+\\):"
+               "Line \\([0-9]+\\), "
+               "Columns \\([0-9]+\\)-\\([0-9]+\\):"
                ".*$")
       lb-datalog--block-regexp-to-filename 2 (3 . 4) nil 1))
   "Compilation error regexp-alist for `lb-datalog-mode' buffers.")
@@ -91,9 +94,50 @@ This corresponds to the regular expression which captures the block name."
   (eval-when-compile
     `(,(concat "^"
                "Block \\(.+\\): "
-               "Line \\([0-9]+\\), Column \\([0-9]+\\):"
+               "Line \\([0-9]+\\), "
+               "Column \\([0-9]+\\):"
                ".*$")
       lb-datalog--block-regexp-to-filename 2 3 nil 1))
+  "Compilation error regexp-alist for `lb-datalog-mode' buffers.")
+
+(defvar lb-compilation-error-regexp-alist5
+  (eval-when-compile
+    `(,(concat "^"
+               "File \\(.+\\) (Block .+) : "
+               "Lines \\([0-9]+\\)\\(?:-\\([0-9]+\\)\\), "
+               "Columns \\([0-9]+\\)-\\([0-9]+\\):"
+               "$")
+      (1 "%s.logic") (2 . 3) (4 . 5) nil 1))
+  "Compilation error regexp-alist for `lb-datalog-mode' buffers.")
+
+(defvar lb-compilation-error-regexp-alist6
+  (eval-when-compile
+    `(,(concat "^"
+               "File \\(.+\\) (Block .+) : "
+               "Lines \\([0-9]+\\)\\(?:-\\([0-9]+\\)\\), "
+               "Column \\([0-9]+\\):"
+               ".*$")
+      (1 "%s.logic") (2 . 3) 4 nil 1))
+  "Compilation error regexp-alist for `lb-datalog-mode' buffers.")
+
+(defvar lb-compilation-error-regexp-alist7
+  (eval-when-compile
+    `(,(concat "^"
+               "Block \\(.+\\): "
+               "Lines \\([0-9]+\\)\\(?:-\\([0-9]+\\)\\), "
+               "Columns \\([0-9]+\\)-\\([0-9]+\\):"
+               ".*$")
+      lb-datalog--block-regexp-to-filename (2 . 3) (4 . 5) nil 1))
+  "Compilation error regexp-alist for `lb-datalog-mode' buffers.")
+
+(defvar lb-compilation-error-regexp-alist8
+  (eval-when-compile
+    `(,(concat "^"
+               "Block \\(.+\\): "
+               "Lines \\([0-9]+\\)\\(?:-\\([0-9]+\\)\\), "
+               "Column \\([0-9]+\\):"
+               ".*$")
+      lb-datalog--block-regexp-to-filename (2 . 3) 4 nil 1))
   "Compilation error regexp-alist for `lb-datalog-mode' buffers.")
 
 
@@ -108,7 +152,11 @@ This corresponds to the regular expression which captures the block name."
    (dolist (error-regexp (list lb-compilation-error-regexp-alist1
                                lb-compilation-error-regexp-alist2
                                lb-compilation-error-regexp-alist3
-                               lb-compilation-error-regexp-alist4))
+                               lb-compilation-error-regexp-alist4
+                               lb-compilation-error-regexp-alist5
+                               lb-compilation-error-regexp-alist6
+                               lb-compilation-error-regexp-alist7
+                               lb-compilation-error-regexp-alist8))
      (add-to-list 'compilation-error-regexp-alist error-regexp))))
 
 (provide 'lb-datalog-compile)
