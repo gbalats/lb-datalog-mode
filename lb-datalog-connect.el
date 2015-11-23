@@ -75,8 +75,13 @@ Return a buffer that contains the output."
           (command (format "%s %s" lb-datalog-cli (s-join " " command-args))))
       (message "Running: %s" command)
       (with-current-buffer output-buffer
+        (insert (propertize "Running LB command:"
+                            'face 'underline))
+        (insert "\n\n")
         (insert (propertize (format "%s\n\n" command)
-                            'face 'bold)))
+                            'face '(:foreground "cyan")))
+        (insert (propertize "Output:" 'face 'underline))
+        (insert "\n\n"))
       (apply 'start-process
              (append (list "LB Datalog" output-buffer lb-datalog-cli)
                      command-args))

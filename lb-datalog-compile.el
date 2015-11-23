@@ -145,7 +145,6 @@ This corresponds to the regular expression which captures the block name."
 ;; Add compilation hook
 ;;----------------------------
 
-
 (add-hook
  'compilation-mode-hook
  (lambda ()
