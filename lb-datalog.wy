@@ -1,0 +1,500 @@
+;;; lb-datalog.wy -- LALR grammar for LB Datalog
+;;
+;; Copyright (C) 2002, 2003, 2004, 2005, 2006 David Ponce
+;;
+;; Author: George Balatsouras <gbalats@gmail.com>
+;; Maintainer: David Ponce <gbalats@gmail.com>
+;; Created: 02 November 2014
+;; Keywords: syntax
+;;
+;; This file is not part of GNU Emacs.
+;;
+;; This program is free software; you can redistribute it and/or
+;; modify it under the terms of the GNU General Public License as
+;; published by the Free Software Foundation; either version 2, or (at
+;; your option) any later version.
+;;
+;; This software is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+;; General Public License for more details.
+;;
+;; You should have received a copy of the GNU General Public License
+;; along with GNU Emacs; see the file COPYING.  If not, write to the
+;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+;; Boston, MA 02110-1301, USA.
+;;
+;;; Commentary:
+;;
+;; Parser for the LB Datalog language
+
+;; -----------
+;; Settings
+;; -----------
+
+%package wisent-lb-datalog-wy
+%provide wisent/lb-datalog-wy
+
+%languagemode lb-datalog-mode
+
+;; The default start symbol
+%start compilation_unit
+;; Alternate entry points
+;;    - Needed by partial re-parse
+%start clause
+%start var
+%start var_ext
+;;    - Needed by EXPANDFULL clauses
+%start vars_ext
+%start vars
+
+;; -----------------
+;; Keyword terminals
+;; -----------------
+
+;; Generate a keyword analyzer
+%type  <keyword> ;;syntax "\\(\\sw\\|\\s_\\)+" matchdatatype keyword
+
+%keyword BOOLEAN      "boolean"
+%put     BOOLEAN summary
+"Primitive logical quantity type (true or false)"
+
+%keyword FLOAT        "float"
+%put     FLOAT summary
+"Primitive floating-point type (single-precision 32-bit IEEE 754)"
+
+%keyword FLOAT32      "float[32]"
+%put     FLOAT32 summary
+"Primitive floating-point type (single-precision 32-bit IEEE 754)"
+
+%keyword FLOAT64      "float[64]"
+%put     FLOAT64 summary
+"Primitive floating-point type (double-precision 64-bit IEEE 754)"
+
+%keyword INT          "int"
+%put     INT summary
+"Integral primitive type"
+
+%keyword INT8         "int[8]"
+%put     INT8 summary
+"Integral primitive type (8-bit)"
+
+%keyword INT16        "int[16]"
+%put     INT16 summary
+"Integral primitive type (16-bit)"
+
+%keyword INT32        "int[32]"
+%put     INT32 summary
+"Integral primitive type (32-bit)"
+
+%keyword INT64        "int[64]"
+%put     INT64 summary
+"Integral primitive type (64-bit)"
+
+%keyword UINT         "uint"
+%put     UINT summary
+"Unsigned integral primitive type"
+
+%keyword UINT8        "uint[8]"
+%put     UINT8 summary
+"Unsigned integral primitive type (8-bit)"
+
+%keyword UINT16       "uint[16]"
+%put     UINT16 summary
+"Unsigned integral primitive type (16-bit)"
+
+%keyword UINT32       "uint[32]"
+%put     UINT32 summary
+"Unsigned integral primitive type (32-bit)"
+
+%keyword UINT64       "uint[64]"
+%put     UINT64 summary
+"Unsigned integral primitive type (64-bit)"
+
+%keyword STRING       "string"
+%put     STRING summary
+"String primitive type"
+
+%keyword COLOR        "color"
+%put     COLOR summary
+"Color primitive type"
+
+%keyword DATETIME     "datetime"
+%put     DATETIME summary
+"Datetime primitive type"
+
+%keyword DECIMAL      "decimal"
+%put     DECIMAL summary
+"Decimal primitive type"
+
+%keyword DECIMAL64    "decimal[64]"
+%put     DECIMAL64 summary
+"Decimal primitive type (64-bit)"
+
+%keyword DECIMAL128   "decimal[128]"
+%put     DECIMAL128 summary
+"Decimal primitive type (128-bit)"
+
+%keyword AGG          "agg"
+
+;; ------------------
+;; Operator terminals
+;; ------------------
+%type  <punctuation> ;;syntax "\\(\\s.\\|\\s$\\|\\s'\\)+" matchdatatype string
+
+%token <punctuation> NOT         "!"
+%token <punctuation> NOTEQ       "!="
+%token <punctuation> MULT        "*"
+%token <punctuation> PLUS        "+"
+%token <punctuation> COMMA       ","
+%token <punctuation> MINUS       "-"
+%token <punctuation> DOT         "."
+%token <punctuation> DIV         "/"
+%token <punctuation> COLON       ":"
+%token <punctuation> SEMICOLON   ";"
+%token <punctuation> LT          "<"
+%token <punctuation> LTEQ        "<="
+%token <punctuation> EQ          "="
+%token <punctuation> GT          ">"
+%token <punctuation> GTEQ        ">="
+%token <punctuation> RARROW      "->"
+%token <punctuation> LARROW      "<-"
+%token <punctuation> AT          "@"
+%token <punctuation> UPSERT      "^"
+
+;; -----------------------------
+;; Block & Parenthesis terminals
+;; -----------------------------
+%type  <block>       ;;syntax "\\s(\\|\\s)" matchdatatype block
+
+%token <block>       PAREN_BLOCK   "(LPAREN RPAREN)"
+%token <block>       BRACE_BLOCK   "(LBRACE RBRACE)"
+%token <block>       BRACKET_BLOCK "(LBRACKET RBRACKET)"
+
+%token <open-paren>  LPAREN      "("
+%token <close-paren> RPAREN      ")"
+%token <open-paren>  LBRACE      "{"
+%token <close-paren> RBRACE      "}"
+%token <open-paren>  LBRACKET    "["
+%token <close-paren> RBRACKET    "]"
+%token <open-paren>  LAGG        "<<"
+%token <close-paren> RAGG        ">>"
+
+;; -----------------
+;; Literal terminals
+;; -----------------
+%type  <symbol>      ;;syntax "\\(\\sw\\|\\s_\\)+"
+%token <symbol>      BOOLEAN_LITERAL "\\`false\\'"
+%token <symbol>      BOOLEAN_LITERAL "\\`true\\'"
+%token <symbol>      PHASE_LITERAL "prev"
+%token <symbol>      PHASE_LITERAL "previous"
+%token <symbol>      PHASE_LITERAL "init"
+%token <symbol>      PHASE_LITERAL "initial"
+%token <symbol>      PHASE_LITERAL "final"
+%token <symbol>      IDENTIFIER
+
+%type  <string>      ;;syntax "\\s\"" matchdatatype sexp
+%token <string>      STRING_LITERAL
+
+%type  <number>      ;;syntax semantic-lex-number-expression
+%token <number>      NUMBER_LITERAL
+
+
+%%
+
+
+;; ------------------------------------------
+;; LALR Grammar
+;; ------------------------------------------
+
+compilation_unit
+  : clause
+  ;
+
+;; ------------------------
+;; Clauses
+;; ------------------------
+
+clause
+  : rule
+  | constraint
+  ;
+
+rule
+  : formula LARROW formula DOT
+  | formula LARROW agg_head DOT
+  | formula LARROW DOT
+  ;
+
+constraint
+  : formula RARROW formula DOT
+  | formula RARROW DOT
+  | formula DOT
+  ;
+
+;; ;; this does not include subtype declarations, since they are
+;; ;; syntactically a subset of the more generic declaration clause type
+
+;; entity_declaration
+;;   : entity_atom RARROW DOT
+;;   | entity_atom COMMA refmode_atom RARROW type_atom DOT
+;;   ;
+
+;; declaration
+;;   : atom RARROW type_atom_list DOT
+;;   ;
+
+;; ------------------------
+;; Formulas
+;; ------------------------
+
+formula
+  : disjunctive_formula
+  ;
+
+disjunctive_formula
+  : disjunctive_formula SEMICOLON conjunctive_formula
+  | conjunctive_formula
+  ;
+
+conjunctive_formula
+  : conjunctive_formula COMMA negated_formula
+  | negated_formula
+  ;
+
+negated_formula
+  : NOT simple_formula
+  | simple_formula
+  ;
+
+simple_formula
+  : LPAREN formula RPAREN
+  | expr comp_op expr
+  | atom_ext
+  ;
+
+;; ------------------------
+;; Expressions
+;; ------------------------
+
+expr
+  : arithm_expr
+  ;
+
+comp_op
+  : LT
+  | LTEQ
+  | GT
+  | GTEQ
+  | EQ
+  | NOTEQ
+  ;
+
+arithm_expr
+  : additive_expr 
+  ;
+
+additive_expr
+  : additive_expr PLUS multiplicative_expr
+  | additive_expr MINUS multiplicative_expr
+  | multiplicative_expr
+  ;
+
+multiplicative_expr
+  : multiplicative_expr MULT unary_expr
+  | multiplicative_expr DIV unary_expr
+  | unary_expr
+  ;
+
+unary_expr
+  : IDENTIFIER
+  | literal
+  | LPAREN expr RPAREN
+  ;
+
+literal
+  : BOOLEAN_LITERAL
+  | NUMBER_LITERAL
+  | STRING_LITERAL
+  ;
+
+;; ------------------------
+;; Aggregations
+;; ------------------------
+
+agg_head
+  : AGG LAGG IDENTIFIER EQ IDENTIFIER LPAREN var_list RPAREN RAGG
+  ;
+
+;; ------------------------
+;; Atoms
+;; ------------------------
+
+;; atom
+;;   : IDENTIFIER LPAREN var_list RPAREN
+;;   | IDENTIFIER LBRACKET var_list RBRACKET EQ IDENTIFIER
+;;   ;
+
+atom_ext
+  : simple_atom
+  | refmode_atom
+  | functional_atom
+  | primitive_type_atom
+  ;
+
+simple_atom
+  : pred LPAREN var_list_ext RPAREN
+  ;
+
+functional_atom
+  : pred LBRACKET var_list_ext RBRACKET EQ IDENTIFIER
+  ;
+
+refmode_atom
+  : pred LPAREN var_ext COLON var_ext RPAREN
+  ;
+
+primitive_type_atom
+  : primitive_type LPAREN var_ext RPAREN
+  ;
+
+;; entity_atom
+;;   : IDENTIFIER LPAREN var_ext RPAREN
+;;   ;
+
+;; type_atom
+;;   : primitive_type_atom
+;;   | entity_atom
+;;   ;
+
+;; atom_list
+;;   : atom
+;;   | atom_list COMMA atom
+;;   ;
+
+;; atom_list_ext
+;;   : atom_list_ext COMMA atom_ext
+;;   | atom_ext
+;;   ;
+
+pred
+  : delta_pred
+  ;
+
+delta_pred
+  : simple_pred
+  | PLUS   simple_pred
+  | MINUS  simple_pred
+  | MULT   simple_pred
+  | UPSERT simple_pred
+  ;
+
+simple_pred
+  : IDENTIFIER
+  | IDENTIFIER AT PHASE_LITERAL
+  ;
+
+;; ------------------------
+;; Variables
+;; ------------------------
+
+var
+  : IDENTIFIER
+  ;
+
+var_ext
+  : IDENTIFIER LBRACKET var_list_ext RBRACKET
+  | IDENTIFIER
+  | literal
+  ;
+
+vars
+  : LPAREN
+    ()
+  | RPAREN
+    ()
+  | var COMMA
+  | var RPAREN
+  ;
+
+vars_ext
+  : LPAREN
+    ()
+  | RPAREN
+    ()
+  | var_ext COMMA
+  | var_ext RPAREN
+  ;
+
+var_list
+  : PAREN_BLOCK
+    (EXPANDFULL $1 vars)
+  ;
+
+var_list_ext
+  : PAREN_BLOCK
+    (EXPANDFULL $1 vars_ext)
+  ;
+
+
+;; ------------------------
+;; Type Predicates
+;; ------------------------
+
+primitive_type
+  : numeric_type
+  | BOOLEAN
+  | STRING
+  | COLOR
+  | DATETIME
+  ;
+
+numeric_type
+  : integral_type
+  | floating_point_type
+  ;
+
+integral_type
+  : INT
+  | INT8
+  | INT16
+  | INT32
+  | INT64
+  | UINT
+  | UINT8
+  | UINT16
+  | UINT32
+  | UINT64
+  ;
+
+floating_point_type
+  : FLOAT
+  | FLOAT32
+  | FLOAT64
+  | DECIMAL
+  | DECIMAL64
+  | DECIMAL128
+  ;
+
+
+%%
+
+;; Define the lexer for this grammar
+(define-lex wisent-lb-datalog-lexer
+  "Lexical analyzer that handles LB Datalog buffers.
+It ignores whitespaces, newlines and comments."
+  semantic-lex-ignore-whitespace
+  semantic-lex-ignore-newline
+  semantic-lex-ignore-comments
+  ;;;; Auto-generated analyzers.
+  wisent-lb-datalog-wy--<number>-regexp-analyzer
+  wisent-lb-datalog-wy--<string>-sexp-analyzer
+  ;; Must detect keywords before other symbols
+  wisent-lb-datalog-wy--<keyword>-keyword-analyzer
+  wisent-lb-datalog-wy--<symbol>-regexp-analyzer
+  wisent-lb-datalog-wy--<punctuation>-string-analyzer
+  wisent-lb-datalog-wy--<block>-block-analyzer
+  ;;;;
+  semantic-lex-default-action)
+
+;;; lb-datalog.wy ends here
