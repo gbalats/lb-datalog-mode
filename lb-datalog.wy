@@ -33,7 +33,7 @@
 ;; -----------
 
 %package wisent-lb-datalog-wy
-%provide wisent/lb-datalog-wy
+%provide lb-datalog-wy
 
 %languagemode lb-datalog-mode
 
@@ -53,7 +53,7 @@
 ;; -----------------
 
 ;; Generate a keyword analyzer
-%type  <keyword> ;;syntax "\\(\\sw\\|\\s_\\)+" matchdatatype keyword
+%type  <keyword> syntax "\\(\\sw\\|\\s_\\)+\\(\\[[0-9]+\\]\\)?" matchdatatype keyword
 
 %keyword BOOLEAN      "boolean"
 %put     BOOLEAN summary
