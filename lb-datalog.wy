@@ -161,6 +161,10 @@
 %token <punctuation> LARROW      "<-"
 %token <punctuation> AT          "@"
 %token <punctuation> UPSERT      "^"
+%token <punctuation> BACKQUOTE   "`"
+%token <punctuation> LAGG        "<<"
+%token <punctuation> RAGG        ">>"
+
 
 ;; -----------------------------
 ;; Block & Parenthesis terminals
@@ -177,8 +181,6 @@
 %token <close-paren> RBRACE      "}"
 %token <open-paren>  LBRACKET    "["
 %token <close-paren> RBRACKET    "]"
-%token <open-paren>  LAGG        "<<"
-%token <close-paren> RAGG        ">>"
 
 ;; -----------------
 ;; Literal terminals
@@ -323,7 +325,7 @@ literal
 ;; ------------------------
 
 agg_head
-  : AGG LAGG IDENTIFIER EQ IDENTIFIER LPAREN var_list RPAREN RAGG
+  : AGG LAGG var EQ IDENTIFIER LPAREN var_list RPAREN RAGG
   ;
 
 ;; ------------------------
@@ -492,8 +494,8 @@ It ignores whitespaces, newlines and comments."
   ;; Must detect keywords before other symbols
   wisent-lb-datalog-wy--<keyword>-keyword-analyzer
   wisent-lb-datalog-wy--<symbol>-regexp-analyzer
-  wisent-lb-datalog-wy--<punctuation>-string-analyzer
   wisent-lb-datalog-wy--<block>-block-analyzer
+  wisent-lb-datalog-wy--<punctuation>-string-analyzer
   ;;;;
   semantic-lex-default-action)
 
