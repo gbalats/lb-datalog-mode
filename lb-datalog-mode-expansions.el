@@ -43,7 +43,7 @@
 
 
 (require 'lb-datalog-core)
-(require 'expand-region-core)
+(require 'expand-region-core nil 'noerror)
 
 
 (defun lb-datalog-mark-clause ()

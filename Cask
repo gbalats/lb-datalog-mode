@@ -11,7 +11,6 @@
 (depends-on "f" "0.17.1")
 (depends-on "multiple-cursors" "1.0.0")
 (depends-on "pkg-info" "0.4")
-(depends-on "expand-region" "0.8")
 (depends-on "cl-lib" "0.5")
 
 (development
@@ -19,4 +18,5 @@
  (depends-on "ecukes")
  (depends-on "ert-runner")
  (depends-on "el-mock")
+ (depends-on "expand-region" "0.8")
  (depends-on "yasnippet"))
