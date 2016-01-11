@@ -67,6 +67,19 @@ The PATH is then stored to the `lb-datalog-workspace' variable."
 ;; Command line interface
 ;;--------------------------
 
+(defun lb-datalog-sentinel (process event)
+  "Monitor LB Datalog PROCESS for changing its state via EVENT."
+  (cond
+   ;; Received process finished event
+   ((s-match "finished" event)
+    (progn
+      (with-current-buffer (process-buffer process)
+        (insert "\n")
+        (insert (format "Process %s has finished" process)))))
+   ;; Default case
+   (t (princ
+       (format "Process: %s had the event `%s'" process event)))))
+
 (defun lb-datalog-run-command (&rest command-args)
   "Run command with given COMMAND-ARGS.
 Return a buffer that contains the output."
@@ -74,6 +87,7 @@ Return a buffer that contains the output."
     (let ((output-buffer (generate-new-buffer "*LB Datalog*"))
           (command (format "%s %s" lb-datalog-cli (s-join " " command-args))))
       (message "Running: %s" command)
+      ;; Print query to process buffer
       (with-current-buffer output-buffer
         (insert (propertize "Running LB command:"
                             'face 'underline))
@@ -82,9 +96,12 @@ Return a buffer that contains the output."
                             'face '(:foreground "cyan")))
         (insert (propertize "Output:" 'face 'underline))
         (insert "\n\n"))
-      (apply 'start-process
-             (append (list "LB Datalog" output-buffer lb-datalog-cli)
-                     command-args))
+      ;; Spawn sub-process while setting sentinel
+      (set-process-sentinel
+       (apply 'start-process
+              (append (list "LB Datalog" output-buffer lb-datalog-cli)
+                      command-args))
+       'lb-datalog-sentinel)
       (display-buffer output-buffer)
       output-buffer)))
 
