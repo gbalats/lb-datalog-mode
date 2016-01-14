@@ -77,4 +77,4 @@ $(HOME)/.cask:
 install: $(project.tar)
 
 $(project.tar):
-	$(EMACS) --batch --eval "(progn (package-initialize)(package-install-file \"$@\" ))"
+	$(EMACS) --batch --eval "(progn (package-initialize)(package-install-file \"$(abspath $@)\" ))"
