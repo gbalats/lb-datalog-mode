@@ -13,6 +13,18 @@ project_include := $(addprefix -l , $(project_sources))
 
 export EMACS
 
+define pkg_install_file
+emacs --batch --eval "                                           \
+  (progn                                                         \
+     (require 'package)                                          \
+     (add-to-list 'package-archives                              \
+                  '(\"melpa\" . \"http://melpa.org/packages/\")) \
+     (package-initialize)                                        \
+     (unless package-archive-contents                            \
+        (package-refresh-contents))                              \
+     (package-install-file \"$1\" ))                             \
+  "
+endef
 
 all: $(project)-pkg.el dist
 
@@ -77,4 +89,4 @@ $(HOME)/.cask:
 install: $(project.tar)
 
 $(project.tar):
-	$(EMACS) --batch --eval "(progn (package-initialize)(package-install-file \"$(abspath $@)\" ))"
+	$(call pkg_install_file,$(abspath $@))
