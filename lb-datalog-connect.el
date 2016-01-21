@@ -123,6 +123,19 @@ Return a buffer that contains the output."
     (setq path lb-datalog-workspace))
   (lb-datalog-run-command "-db" (f-full path) "-query" query-code))
 
+(defun lb-datalog-pop-count-workspace (&optional predicates path)
+  "List the sizes of PREDICATES for the workspace residing at PATH.
+
+The argument PREDICATES must be a list of predicate names.  If no
+PREDICATES are given, list the sizes for all predicates of the
+workspace."
+  (unless path
+    (setq path lb-datalog-workspace))
+  (if predicates
+      (lb-datalog-run-command
+       "-db" (f-full path) "-popCount" (s-join "," predicates))
+    (lb-datalog-run-command "-db" (f-full path) "-popCount")))
+
 
 ;;------------------------
 ;; Interactive commands
@@ -182,6 +195,14 @@ position FROM and TO."
   (lb-datalog-with-region-and-ws from to
     (let ((code-string (buffer-substring-no-properties from to)))
       (lb-datalog-add-to-workspace code-string))))
+
+;;;###autoload
+(defun lb-datalog-pop-count ()
+  "List all predicate sizes of active workspace."
+  (interactive)
+  (unless lb-datalog-workspace      ; connect to workspace
+    (call-interactively 'lb-datalog-connect))
+  (lb-datalog-pop-count-workspace))
 
 
 (provide 'lb-datalog-connect)
