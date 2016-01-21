@@ -67,6 +67,35 @@ The PATH is then stored to the `lb-datalog-workspace' variable."
 ;; Command line interface
 ;;--------------------------
 
+(defun lb-datalog-ws-predicates (&optional path)
+  "Return a list of all predicates of workspace at PATH."
+  (unless path
+    (setq path lb-datalog-workspace))
+  (cdr (lb-datalog-process-lines "-db" (f-full path) "-list")))
+
+(defun lb-datalog-process-lines (&rest command-args)
+  "Run command with given COMMAND-ARGS.
+Return its output as a list of lines."
+  (lb-datalog-with-env
+   (let ((command (format "%s %s" lb-datalog-cli (s-join " " command-args)))
+         (predicates '()))
+      (message "Running: %s" command)
+      ;; Print query to process buffer
+      (with-temp-buffer
+        (apply 'call-process
+               (append (list lb-datalog-cli nil '(t nil) nil)
+                       command-args))
+        (goto-char (point-min))
+        ;; iterate over buffer lines
+        (while (not (= (point) (point-max)))
+          (let ((line
+                 (buffer-substring-no-properties (point-at-bol)
+                                                 (point-at-eol))))
+            (setq predicates (cons (s-trim line) predicates))
+            (forward-line 1)))
+        ;; return list of lines in correct order
+        (nreverse predicates)))))
+
 (defun lb-datalog-sentinel (process event)
   "Monitor LB Datalog PROCESS for changing its state via EVENT."
   (cond
