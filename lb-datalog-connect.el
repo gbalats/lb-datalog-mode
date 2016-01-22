@@ -51,27 +51,48 @@ qualified path to it."
        ,@body
      (user-error "Executable `%s' is missing" lb-datalog-cli)))
 
-(defvar lb-datalog-workspace
+
+;;----------------------------
+;; Workspace Type Definition
+;;----------------------------
+
+(cl-defstruct lb-datalog-workspace
+  "Workspace type with metadata."
+  path                     ; project path
+  predicates)              ; a list of its predicates
+
+
+(defvar lb-datalog-current-ws
   nil
-  "*The path to an LB Datalog workspace.")
+  "*The current LB Datalog workspace.")
+
+(defun lb-datalog-current-workspace ()
+  "Return the path to the current workspace."
+  (when lb-datalog-current-ws
+      (lb-datalog-workspace-path lb-datalog-current-ws)))
+
+(defun lb-datalog-ws-predicates (&optional path)
+  "Return a list of all predicates of workspace at PATH."
+  (unless path
+    (setq path (lb-datalog-current-workspace)))
+  (cdr (lb-datalog-process-lines "-db" (f-full path) "-list")))
+
 
 ;;;###autoload
 (defun lb-datalog-connect (path)
   "Connect to an existing LB Datalog workspace.
 The PATH is then stored to the `lb-datalog-workspace' variable."
   (interactive "DConnect to workspace: ")
-  (setq lb-datalog-workspace path))
+  (let ((ws    (make-lb-datalog-workspace :path (f-full path)))
+        (preds (lb-datalog-ws-predicates path)))
+    (setf (lb-datalog-workspace-predicates ws) preds)
+    (setq lb-datalog-current-ws ws)))
+
 
 
 ;;--------------------------
 ;; Command line interface
 ;;--------------------------
-
-(defun lb-datalog-ws-predicates (&optional path)
-  "Return a list of all predicates of workspace at PATH."
-  (unless path
-    (setq path lb-datalog-workspace))
-  (cdr (lb-datalog-process-lines "-db" (f-full path) "-list")))
 
 (defun lb-datalog-process-lines (&rest command-args)
   "Run command with given COMMAND-ARGS.
@@ -137,20 +158,26 @@ Return a buffer that contains the output."
 (defun lb-datalog-create-workspace (&optional path)
   "Create a new workspace at PATH."
   (unless path
-    (setq path lb-datalog-workspace))
+    (setq path (lb-datalog-current-workspace)))
   (lb-datalog-run-command "-db" (f-full path) "-create" "-overwrite"))
 
 (defun lb-datalog-add-to-workspace (code &optional path)
   "Add CODE to workspace residing at PATH."
   (unless path
-    (setq path lb-datalog-workspace))
+    (setq path (lb-datalog-current-workspace)))
   (lb-datalog-run-command "-db" (f-full path) "-addBlock" code))
 
 (defun lb-datalog-query-workspace (query-code &optional path)
   "Run QUERY-CODE for the workspace residing at PATH."
   (unless path
-    (setq path lb-datalog-workspace))
+    (setq path (lb-datalog-current-workspace)))
   (lb-datalog-run-command "-db" (f-full path) "-query" query-code))
+
+(defun lb-datalog-pred-info-workspace (predicate &optional path)
+  "Print information for PREDICATE of workspace residing at PATH."
+  (unless path
+    (setq path (lb-datalog-current-workspace)))
+  (lb-datalog-run-command "-db" (f-full path) "-predInfo" predicate))
 
 (defun lb-datalog-pop-count-workspace (&optional predicates path)
   "List the sizes of PREDICATES for the workspace residing at PATH.
@@ -159,7 +186,7 @@ The argument PREDICATES must be a list of predicate names.  If no
 PREDICATES are given, list the sizes for all predicates of the
 workspace."
   (unless path
-    (setq path lb-datalog-workspace))
+    (setq path (lb-datalog-current-workspace)))
   (if predicates
       (lb-datalog-run-command
        "-db" (f-full path) "-popCount" (s-join "," predicates))
@@ -187,9 +214,9 @@ Also connect to workspace before executing BODY, if needed."
            (lb-datalog-forward-clause 1)
            (unless (< (point) orig-point)
              (setq ,end (point))))))
-     (if (not (and ,start ,end))         ; region must be selected
+     (if (not (and ,start ,end))        ; region must be selected
          (user-error "No active region or clause at point")
-       (unless lb-datalog-workspace      ; connect to workspace
+       (unless lb-datalog-current-ws    ; connect to workspace
          (call-interactively 'lb-datalog-connect))
        ,@body)))
 
@@ -229,10 +256,22 @@ position FROM and TO."
 (defun lb-datalog-pop-count ()
   "List all predicate sizes of active workspace."
   (interactive)
-  (unless lb-datalog-workspace      ; connect to workspace
+  (unless lb-datalog-current-ws         ; connect to workspace
     (call-interactively 'lb-datalog-connect))
   (lb-datalog-pop-count-workspace))
 
+;;;###autoload
+(defun lb-datalog-pred-info (predicate)
+  "Print information for PREDICATE."
+  (interactive
+   (list
+    (progn
+      (unless lb-datalog-current-ws         ; connect to workspace
+        (call-interactively 'lb-datalog-connect))
+      (let ((ws lb-datalog-current-ws))
+        (completing-read "Enter predicate: "
+                         (lb-datalog-workspace-predicates ws))))))
+  (lb-datalog-pred-info-workspace predicate))
 
 (provide 'lb-datalog-connect)
 

@@ -283,6 +283,7 @@ For detail, see `comment-dwim'."
     (define-key map (kbd "C-c C-q") 'lb-datalog-query)
     (define-key map (kbd "C-c C-a") 'lb-datalog-add-block)
     (define-key map (kbd "C-c C-p") 'lb-datalog-pop-count)
+    (define-key map (kbd "C-c i") 'lb-datalog-pred-info)
     (define-key map (kbd "C-M-e") 'lb-datalog-forward-clause)
     (define-key map (kbd "C-M-a") 'lb-datalog-backward-clause)
     (define-key map (kbd "M-e") 'lb-datalog-forward-atom)

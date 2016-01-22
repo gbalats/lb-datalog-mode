@@ -54,6 +54,7 @@ Keyboard shortcut        | Description
 <kbd>C-:</kbd>           | Rename local variable (at clause scope).
 <kbd>C-c C-c</kbd>       | Connect to workspace.
 <kbd>C-c C-q</kbd>       | Run Datalog query on connected workspace.
+<kbd>C-c i</kbd>         | Get predicate info on connected workspace.
 <kbd>C-c C-p</kbd>       | List predicate sizes on connected workspace.
 <kbd>C-c C-a</kbd>       | Add Datalog block of code to connected workspace.
 <kbd>C-c C-f</kbd>       | Insert a functional atom at point. This requires [yasnippet][yasnippet] to be installed.
