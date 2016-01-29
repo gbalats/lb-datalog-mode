@@ -177,6 +177,25 @@ backward to previous atom."
   (when (< arg 0)
     (lb-datalog-backward-atom (- arg))))
 
+(defun lb-datalog-bounds-of-clause-at-point ()
+  "Determine the start and end buffer locations for the clause at point.
+
+Return a cons cell (START . END) giving the start and end
+positions of the clause found."
+  (let ((orig-point (point))
+        (start nil)
+        (end nil))
+    (save-excursion
+      (forward-char 1)
+      (lb-datalog-backward-clause 1)
+      (unless (> (point) orig-point)
+        (setq start (point)))
+      (lb-datalog-forward-clause 1)
+      (unless (< (point) orig-point)
+        (setq end (point))))
+    (when (and start end)
+      (cons start end))))
+
 
 (provide 'lb-datalog-core)
 
