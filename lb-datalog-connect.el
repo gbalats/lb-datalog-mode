@@ -34,6 +34,7 @@
 
 (require 'f)
 (require 's)
+(require 'thingatpt)
 (require 'lb-datalog-core)
 
 (defcustom lb-datalog-cli "bloxbatch"
@@ -179,6 +180,12 @@ Return a buffer that contains the output."
     (setq path (lb-datalog-current-workspace)))
   (lb-datalog-run-command "-db" (f-full path) "-predInfo" predicate))
 
+(defun lb-datalog-pred-print-workspace (predicate &optional path)
+  "Print all rows of PREDICATE of workspace residing at PATH."
+  (unless path
+    (setq path (lb-datalog-current-workspace)))
+  (lb-datalog-run-command "-db" (f-full path) "-print" predicate))
+
 (defun lb-datalog-pop-count-workspace (&optional predicates path)
   "List the sizes of PREDICATES for the workspace residing at PATH.
 
@@ -272,6 +279,24 @@ position FROM and TO."
         (completing-read "Enter predicate: "
                          (lb-datalog-workspace-predicates ws))))))
   (lb-datalog-pred-info-workspace predicate))
+
+;;;###autoload
+(defun lb-datalog-pred-print (predicate)
+  "Print PREDICATE contents."
+  (interactive
+   (list
+    (progn
+      (unless lb-datalog-current-ws         ; connect to workspace
+        (call-interactively 'lb-datalog-connect))
+      (let* ((workspace  lb-datalog-current-ws)
+             (all-preds  (lb-datalog-workspace-predicates workspace))
+             (bounds     (bounds-of-thing-at-point 'symbol))
+             (pred-thing (if bounds (buffer-substring-no-properties
+                                     (car bounds) (cdr bounds)))))
+        (if (member pred-thing all-preds)
+            (completing-read "Enter predicate: " all-preds nil nil pred-thing)
+          (completing-read "Enter predicate: " all-preds))))))
+  (lb-datalog-pred-print-workspace predicate))
 
 (provide 'lb-datalog-connect)
 
