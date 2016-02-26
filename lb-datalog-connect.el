@@ -116,7 +116,7 @@ If KEEP is true, then any previous connections are preserved."
       (with-current-buffer (process-buffer process)
         (save-excursion
           (goto-char (point-max))
-          (insert "\n")
+          (newline)
           (insert (format "Process %s has finished" process))))))
    ;; Default case
    (t (princ
@@ -153,13 +153,15 @@ Return a buffer that contains the output."
       (with-temp-message (format "Running: %s" command)
         (with-current-buffer output-buffer
           ;; Print query to process buffer
-          (insert (propertize "Running LB command:"
+          (insert (propertize "Running LB command"
                               'face 'underline))
-          (insert "\n\n")
+          (insert ":")
+          (newline 2)
           (insert (propertize (format "%s\n\n" command)
                               'face '(:foreground "cyan")))
-          (insert (propertize "Output:" 'face 'underline))
-          (insert "\n\n"))
+          (insert (propertize "Output" 'face 'underline))
+          (insert ":")
+          (newline 2))
         ;; Spawn sub-process while setting sentinel
         (set-process-sentinel
          (apply 'start-process
