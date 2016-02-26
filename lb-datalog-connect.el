@@ -114,8 +114,10 @@ If KEEP is true, then any previous connections are preserved."
    ((s-match "finished" event)
     (progn
       (with-current-buffer (process-buffer process)
-        (insert "\n")
-        (insert (format "Process %s has finished" process)))))
+        (save-excursion
+          (goto-char (point-max))
+          (insert "\n")
+          (insert (format "Process %s has finished" process))))))
    ;; Default case
    (t (princ
        (format "Process: %s had the event `%s'" process event)))))
