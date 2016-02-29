@@ -69,15 +69,24 @@ qualified path to it."
 
 (defun lb-workspace-path (&optional ws)
   "Return the path to the last connected workspace or WS."
+  (interactive)
   (if (not (or ws lb-open-connections))
       (user-error "No open workspace connections")
-    (lb-ws-path (or ws (car lb-open-connections)))))
+    (let ((path (lb-ws-path (or ws (car lb-open-connections)))))
+      (when (called-interactively-p 'interactive)
+        (message "%s" path))
+      path)))
 
 (defun lb-workspace-predicates (&optional ws)
   "Return a list of predicates of the last connected workspace or WS."
+  (interactive)
   (if (not (or ws lb-open-connections))
       (user-error "No open workspace connections")
-    (lb-ws-predicates (or ws (car lb-open-connections)))))
+    (let ((preds (lb-ws-predicates (or ws (car lb-open-connections)))))
+      (when (called-interactively-p 'interactive)
+        (--each preds
+          (message "%s" it)))
+      preds)))
 
 ;;;###autoload
 (defun lb-datalog-connect (path &optional keep)
