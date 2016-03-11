@@ -67,7 +67,7 @@ This corresponds to the regular expression which captures the block name."
                "Line \\([0-9]+\\), "
                "Columns \\([0-9]+\\)-\\([0-9]+\\):"
                "$")
-      (1 "%s.logic") 2 (3 . 4) nil 1))
+      ,(lambda () (match-string 1)) 2 (3 . 4) nil 1))
   "Compilation error regexp-alist for `lb-datalog-mode' buffers.")
 
 (defvar lb-compilation-error-regexp-alist2
@@ -77,7 +77,7 @@ This corresponds to the regular expression which captures the block name."
                "Line \\([0-9]+\\), "
                "Column \\([0-9]+\\):"
                ".*$")
-      (1 "%s.logic") 2 3 nil 1))
+      ,(lambda () (match-string 1)) 2 3 nil 1))
   "Compilation error regexp-alist for `lb-datalog-mode' buffers.")
 
 (defvar lb-compilation-error-regexp-alist3
@@ -107,7 +107,7 @@ This corresponds to the regular expression which captures the block name."
                "Lines \\([0-9]+\\)\\(?:-\\([0-9]+\\)\\), "
                "Columns \\([0-9]+\\)-\\([0-9]+\\):"
                "$")
-      (1 "%s.logic") (2 . 3) (4 . 5) nil 1))
+      ,(lambda () (match-string 1)) (2 . 3) (4 . 5) nil 1))
   "Compilation error regexp-alist for `lb-datalog-mode' buffers.")
 
 (defvar lb-compilation-error-regexp-alist6
@@ -117,7 +117,7 @@ This corresponds to the regular expression which captures the block name."
                "Lines \\([0-9]+\\)\\(?:-\\([0-9]+\\)\\), "
                "Column \\([0-9]+\\):"
                ".*$")
-      (1 "%s.logic") (2 . 3) 4 nil 1))
+      ,(lambda () (match-string 1)) (2 . 3) 4 nil 1))
   "Compilation error regexp-alist for `lb-datalog-mode' buffers.")
 
 (defvar lb-compilation-error-regexp-alist7
