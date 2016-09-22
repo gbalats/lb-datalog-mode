@@ -91,8 +91,8 @@ is no effect."
                  lb-datalog-mark-clause))))
 
 
-;; add expansions to mode hook
-(add-hook 'lb-datalog-mode-hook 'er/add-lb-datalog-mode-expansions)
+(er/enable-mode-expansions 'lb-datalog-mode
+                           'er/add-lb-datalog-mode-expansions)
 
 
 (provide 'lb-datalog-mode-expansions)
