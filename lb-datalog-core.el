@@ -110,8 +110,8 @@ backward to previous clause."
   (cond ((eq (char-before) ?\.) (backward-char))
         ((eq (char-before) ?\,) (backward-char))
         ((eq (char-before) ?\;) (backward-char))
-        ((looking-back "->")    (backward-char 2))
-        ((looking-back "<-")    (backward-char 2))))
+        ((looking-back "->" 2)  (backward-char 2))
+        ((looking-back "<-" 2)  (backward-char 2))))
 
 
 (defun lb-datalog-backward-atom (&optional arg)
