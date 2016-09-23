@@ -82,12 +82,50 @@ is no effect."
       (pop-mark)
       (goto-char orig-point))))
 
+(defun lb-datalog-mark-head-or-body ()
+  "Mark the head or body of a clause, surrounding point.
+
+Intended for use with `expand-region' as an element of
+`er/try-expand-list'.  If the point is not inside a clause, there
+is no effect."
+  (interactive)
+  (let ((orig-point (point))
+        (after-dot-or-arrow nil)
+        (start-point nil))
+    (forward-char)
+    (lb-datalog-backward-clause)        ; move to clause beginning
+    (setq start-point (point))          ; store clause beginning
+    (while (progn                       ; search for dot, or arrow
+             (re-search-forward "\\.\\|->\\|<-" nil t 1)
+             (nth 8 (syntax-ppss))))
+    (setq after-dot-or-arrow (point))   ; store point after delim and then
+    (lb-datalog--skip-delim-backward)   ; move before it
+    (if (and (>= orig-point start-point)
+             (<= orig-point (point)))   ; check if within head region
+        (progn
+          (lb-datalog-backward-atom)    ; go to beginning of previous atom
+          (lb-datalog-forward-atom)
+          (push-mark start-point t nil) ; case in head: mark region
+          (exchange-point-and-mark))
+      ;; Outside bounds of clause head
+      (lb-datalog-forward-atom)         ; go to beginning of next atom
+      (lb-datalog-backward-atom)
+      (setq start-point (point))        ; store beginning of clause body
+      (lb-datalog-forward-clause)
+      (lb-datalog--skip-delim-backward) ; move right before dot
+      (if (or (< orig-point after-dot-or-arrow)
+              (> orig-point (point)))   ; check if within body region
+          (goto-char orig-point)        ; case outside clause: do nothing
+        (push-mark start-point t nil)   ; case in body: mark region
+        (exchange-point-and-mark)))))
+
 
 (defun er/add-lb-datalog-mode-expansions ()
   "Add LB Datalog specific expansions for buffers in `lb-datalog-mode."
   (set (make-local-variable 'er/try-expand-list)
        (append er/try-expand-list
                '(lb-datalog-mark-atom
+                 lb-datalog-mark-head-or-body
                  lb-datalog-mark-clause))))
 
 
