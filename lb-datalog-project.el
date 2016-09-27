@@ -180,7 +180,8 @@ number of occurrences replaced."
               (setq ok-if-already-exists nil))
             ;; Signal error
             (unless ok-if-already-exists
-              (signal 'predicate-already-exists (list newname)))))))
+              (signal 'predicate-already-exists
+                      (list (make-symbol newname))))))))
     ;; Do the predicate name replacement
     (let ((replacements 0))
       (save-excursion
