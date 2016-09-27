@@ -126,6 +126,28 @@
 ;; Predicate renaming
 ;;------------------------------------------------
 
+
+(defun lb-datalog-read-predicate (prompt)
+  "Read the name of a predicate and return as a string.
+Prompt with PROMPT."
+  (let* ((buffer-predicates '())
+         (bounds  (bounds-of-thing-at-point 'symbol))
+         (pred-thing (if bounds (buffer-substring-no-properties
+                                 (car bounds)
+                                 (cdr bounds)))))
+    (save-excursion
+      (goto-char (point-min))
+      (while (re-search-forward "\\([_:?$[:alnum:]]+\\)\\s-*\\s(.*?\\s)" nil t)
+        (let ((pred (buffer-substring-no-properties
+                     (match-beginning 1)
+                     (match-end 1))))
+          (unless (member pred buffer-predicates)
+            (setq buffer-predicates (cons pred buffer-predicates))))))
+    (if (member pred-thing buffer-predicates)
+        (completing-read prompt buffer-predicates nil nil pred-thing)
+      (completing-read prompt buffer-predicates))))
+
+
 (defun lb-datalog-rename-pred-in-buffer
     (predicate newname &optional ok-if-already-exists)
     "Rename PREDICATE to NEWNAME.  Both args must be strings.
@@ -134,7 +156,11 @@ names.  Signals a `predicate-already-exists' error if a file
 NEWNAME already exists unless optional third argument
 OK-IF-ALREADY-EXISTS is non-nil.  A number as third arg means
 request confirmation if NEWNAME already exists."
-    (interactive "*sPredicate to rename: \nsRename predicate %s to: ")
+    (interactive
+     (let* ((pred-old (lb-datalog-read-predicate "Predicate to rename: "))
+            (pred-new (lb-datalog-read-predicate
+                       (format "Rename predicate %s to: " pred-old))))
+       (list pred-old pred-new)))
     (when (called-interactively-p 'any)
       (setq ok-if-already-exists 1))
     ;; Perform new predicate name check
@@ -151,8 +177,6 @@ request confirmation if NEWNAME already exists."
             ;; Signal error
             (unless ok-if-already-exists
               (signal 'predicate-already-exists (list newname)))))))
-    ;; Print message
-    (message "Renaming predicate %s to %s in %s" predicate newname (buffer-name))
     ;; Do the predicate name replacement
     (save-excursion
       (goto-char (point-min))
@@ -160,7 +184,9 @@ request confirmation if NEWNAME already exists."
       (while (re-search-forward (regexp-quote predicate) nil t)
         ;; Replace when at the end of predicate's name
         (unless (looking-at "[:$[:alnum:]]")
-          (replace-match newname)))))
+          (replace-match newname))))
+    ;; Print message
+    (message "Renamed predicate %s to %s in %s" predicate newname (buffer-name)))
 
 (define-error 'predicate-already-exists "Predicate already exists")
 
