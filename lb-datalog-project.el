@@ -161,16 +161,20 @@ OK-IF-ALREADY-EXISTS is non-nil.  A number as third arg means
 request confirmation if NEWNAME already exists.  Return the
 number of occurrences replaced."
     (interactive
-     (let* ((pred-old (lb-datalog-read-predicate "Predicate to rename: "))
+     (let* ((pred-old (lb-datalog-read-predicate
+                       "Predicate to rename: "))
             (pred-new (lb-datalog-read-predicate
                        (format "Rename predicate %s to: " pred-old))))
        (list pred-old pred-new)))
     (when (called-interactively-p 'any)
       (setq ok-if-already-exists 1))
     ;; Perform new predicate name check
-    (let ((confirm-promp "New predicate name already exists. Rename anyway? ")
-          (confirm-rename-p (numberp ok-if-already-exists))
-          (pred-regexp (concat (regexp-quote newname) "\\s-*\\s(.*?\\s)")))
+    (let ((confirm-promp
+           "New predicate name already exists. Rename anyway? ")
+          (confirm-rename-p
+           (numberp ok-if-already-exists))
+          (pred-regexp
+           (concat (regexp-quote newname) "\\s-*\\s(.*?\\s)")))
       (when (or confirm-rename-p (not ok-if-already-exists))
         (save-excursion
           ;; New predicate name already exists
