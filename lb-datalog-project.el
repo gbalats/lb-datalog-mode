@@ -123,6 +123,48 @@
 
 
 ;;------------------------------------------------
+;; Predicate renaming
+;;------------------------------------------------
+
+(defun lb-datalog-rename-pred-in-buffer
+    (predicate newname &optional ok-if-already-exists)
+    "Rename PREDICATE to NEWNAME.  Both args must be strings.
+If file has names other than FILE, it continues to have those
+names.  Signals a `predicate-already-exists' error if a file
+NEWNAME already exists unless optional third argument
+OK-IF-ALREADY-EXISTS is non-nil.  A number as third arg means
+request confirmation if NEWNAME already exists."
+    (interactive "*sPredicate to rename: \nsRename predicate %s to: ")
+    (when (called-interactively-p 'any)
+      (setq ok-if-already-exists 1))
+    ;; Perform new predicate name check
+    (let ((confirm-promp "New predicate name already exists. Rename anyway? ")
+          (confirm-rename-p (numberp ok-if-already-exists))
+          (pred-regexp (concat (regexp-quote newname) "\\s-*\\s(.*?\\s)")))
+      (when (or confirm-rename-p (not ok-if-already-exists))
+        (save-excursion
+          ;; New predicate name already exists
+          (when (re-search-forward pred-regexp nil t)
+            ;; Ask for confirmation
+            (unless (and confirm-rename-p (y-or-n-p confirm-promp))
+              (setq ok-if-already-exists nil))
+            ;; Signal error
+            (unless ok-if-already-exists
+              (signal 'predicate-already-exists (list newname)))))))
+    ;; Print message
+    (message "Renaming predicate %s to %s in %s" predicate newname (buffer-name))
+    ;; Do the predicate name replacement
+    (save-excursion
+      (goto-char (point-min))
+      ;; Search for each occurrence of predicate
+      (while (re-search-forward (regexp-quote predicate) nil t)
+        ;; Replace when at the end of predicate's name
+        (unless (looking-at "[:$[:alnum:]]")
+          (replace-match newname)))))
+
+(define-error 'predicate-already-exists "Predicate already exists")
+
+;;------------------------------------------------
 ;; Add new project entry after saving new file
 ;;------------------------------------------------
 
