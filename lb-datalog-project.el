@@ -148,6 +148,9 @@ Prompt with PROMPT."
       (completing-read prompt buffer-predicates))))
 
 
+(define-error 'predicate-already-exists
+  "Predicate already exists")
+
 (defun lb-datalog-rename-pred-in-buffer
     (predicate newname &optional ok-if-already-exists)
     "Rename PREDICATE to NEWNAME.  Both args must be strings.
@@ -188,7 +191,6 @@ request confirmation if NEWNAME already exists."
     ;; Print message
     (message "Renamed predicate %s to %s in %s" predicate newname (buffer-name)))
 
-(define-error 'predicate-already-exists "Predicate already exists")
 
 ;;------------------------------------------------
 ;; Add new project entry after saving new file
