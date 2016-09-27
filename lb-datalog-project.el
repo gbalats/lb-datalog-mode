@@ -158,7 +158,8 @@ If file has names other than FILE, it continues to have those
 names.  Signals a `predicate-already-exists' error if a file
 NEWNAME already exists unless optional third argument
 OK-IF-ALREADY-EXISTS is non-nil.  A number as third arg means
-request confirmation if NEWNAME already exists."
+request confirmation if NEWNAME already exists.  Return the
+number of occurrences replaced."
     (interactive
      (let* ((pred-old (lb-datalog-read-predicate "Predicate to rename: "))
             (pred-new (lb-datalog-read-predicate
@@ -181,15 +182,20 @@ request confirmation if NEWNAME already exists."
             (unless ok-if-already-exists
               (signal 'predicate-already-exists (list newname)))))))
     ;; Do the predicate name replacement
-    (save-excursion
-      (goto-char (point-min))
-      ;; Search for each occurrence of predicate
-      (while (re-search-forward (regexp-quote predicate) nil t)
-        ;; Replace when at the end of predicate's name
-        (unless (looking-at "[:$[:alnum:]]")
-          (replace-match newname))))
-    ;; Print message
-    (message "Renamed predicate %s to %s in %s" predicate newname (buffer-name)))
+    (let ((replacements 0))
+      (save-excursion
+        (goto-char (point-min))
+        ;; Search for each occurrence of predicate
+        (while (re-search-forward (regexp-quote predicate) nil t)
+          ;; Replace when at the end of predicate's name
+          (unless (looking-at "[:$[:alnum:]]")
+            (replace-match newname)
+            (setq replacements (1+ replacements)))))
+      ;; Print message
+      (message "Renamed predicate %s to %s in %s"
+               predicate newname (buffer-name))
+      ;; Return number of replacements
+      replacements))
 
 
 ;;------------------------------------------------
