@@ -120,6 +120,14 @@
                 (lb-datalog-find-project-file)))))
      ,@body))
 
+(defmacro lb-datalog-for-each-project-file (var &rest body)
+  "Bind current project to VAR while executing BODY."
+  (declare (debug ((sexp form) body))
+           (indent 1))
+  `(lb-datalog-with-project proj
+     (let ((logic-files (lb-datalog-project-logic proj)))
+       (dolist (,var logic-files)
+         ,@body))))
 
 
 ;;------------------------------------------------
