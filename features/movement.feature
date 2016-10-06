@@ -30,3 +30,5 @@ Feature: Movement
     Then the cursor should be after "foo(x)"
     And I move "1" atoms forward
     Then the cursor should be after "bar(y)"
+    And I move "3" atoms backwards
+    Then the cursor should be before "foobar(x,y)"
