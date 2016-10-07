@@ -15,6 +15,8 @@
 (require 'ert)
 (require 'lb-datalog-mode)
 
+(defun mc/save-lists ()) ;; redefine to do nothing when running tests
+
 (Setup
  ;; Before anything has run
  )
@@ -29,7 +31,7 @@
 
 (After
  ;; After each scenario is run
- )
+ (multiple-cursors-mode 0))
 
 (Teardown
  ;; After when everything has been run

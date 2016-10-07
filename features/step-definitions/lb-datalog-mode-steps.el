@@ -9,6 +9,15 @@
 
 (require 'lb-datalog-mode nil t)
 
+(And "^I rename symbol to \"\\(.*\\)\"$"
+  (lambda (arg)
+    (let ((inhibit-message t))
+      (call-interactively 'mc--mark-symbol-at-point)
+      (call-interactively 'lb-datalog-rename-symbol)
+      (And "I press \"DEL\"")
+      (And "I type \"%s\"" arg)
+      (And "I press \"C-g\""))))
+
 (And "^I move \"\\(.+\\)\" clauses backwards$"
   (lambda (arg) (lb-datalog-backward-clause (string-to-number arg))))
 
