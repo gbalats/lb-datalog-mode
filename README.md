@@ -1,5 +1,5 @@
-lb-datalog-mode
-===============
+# lb-datalog-mode [![Build Status](https://secure.travis-ci.org/gbalats/lb-datalog-mode.png)](http://travis-ci.org/gbalats/lb-datalog-mode)
+
 
 An Emacs mode for LogicBlox Datalog.
 
