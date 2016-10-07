@@ -7,8 +7,7 @@
 
 ;;; Code:
 
-(require 'lb-datalog-mode)
-
+(require 'lb-datalog-mode nil t)
 
 (And "^I move \"\\(.+\\)\" clauses backwards$"
   (lambda (arg) (lb-datalog-backward-clause (string-to-number arg))))

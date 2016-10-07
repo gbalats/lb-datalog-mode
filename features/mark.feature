@@ -1,5 +1,6 @@
 Feature: Marking
   Background:
+    Given I clear the buffer
     Given there is no region selected
     And I turn on lb-datalog-mode
     And I insert:
@@ -9,6 +10,7 @@ Feature: Marking
 
     foobar(x,y) <-
        foo(x), bar(y).
+
     """
 
   Scenario: Mark clause at beginning
