@@ -90,3 +90,10 @@ install: $(project.tar)
 
 $(project.tar):
 	$(call pkg_install_file,$(abspath $@))
+
+
+# Testing with Ecukes
+
+.PHONY: test
+test:
+	$(CASK) exec ecukes
