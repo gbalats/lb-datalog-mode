@@ -1,7 +1,5 @@
 Feature: Movement
   Background:
-    Given I clear the buffer
-    Given there is no region selected
     And I turn on lb-datalog-mode
     And I insert:
     """

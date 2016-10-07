@@ -11,9 +11,9 @@
 
 (add-to-list 'load-path lb-datalog-mode-root-path)
 
-(require 'lb-datalog-mode)
 (require 'espuds)
 (require 'ert)
+(require 'lb-datalog-mode)
 
 (Setup
  ;; Before anything has run
@@ -21,7 +21,11 @@
 
 (Before
  ;; Before each scenario is run
- )
+ (switch-to-buffer
+  (get-buffer-create "*lb-datalog*"))
+ (erase-buffer)
+ (transient-mark-mode 1)
+ (deactivate-mark))
 
 (After
  ;; After each scenario is run
