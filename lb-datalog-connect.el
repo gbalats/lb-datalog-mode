@@ -37,6 +37,7 @@
 (require 's)
 (require 'thingatpt)
 (require 'lb-datalog-core)
+(require 'lb-datalog-project)
 
 
 (defcustom lb-cmd-exe "bloxbatch"
@@ -241,6 +242,20 @@ workspace."
 ;;------------------------
 
 
+(defun lb-datalog-local-ns (&optional buffer)
+  "Return the namespace for local predicates defined in BUFFER, as a string.
+BUFFER defaults to the current buffer."
+  (let* ((file-name     (buffer-file-name buffer))
+         (project-file  (ignore-errors (lb-datalog-find-project-file)))
+         (project-dir   (if project-file (f-dirname project-file))))
+    (when file-name
+      (concat
+       "$"
+       (s-replace-all
+        `(("-" . "_") (,(f-path-separator) . ":"))
+        (f-no-ext (f-relative file-name (or project-dir default-directory))))
+       ":"))))
+
 (defmacro lb-datalog-with-connection (&rest body)
   "Connect to some workspace before executing BODY.
 
@@ -313,10 +328,15 @@ If no region is selected, then use the clause at point."
            (bounds     (bounds-of-thing-at-point 'symbol))
            (pred-thing (if bounds (buffer-substring-no-properties
                                    (car bounds)
-                                   (cdr bounds)))))
-      (if (member pred-thing all-preds)
-          (completing-read "Enter predicate: " all-preds nil nil pred-thing)
-        (completing-read "Enter predicate: " all-preds)))))
+                                   (cdr bounds))))
+           (local-pred-thing
+            (concat (lb-datalog-local-ns) pred-thing)))
+      (completing-read
+       "Enter predicate: " all-preds nil nil
+       (cond ((member pred-thing all-preds)
+              pred-thing)
+             ((member local-pred-thing all-preds)
+              local-pred-thing))))))
 
 ;;;###autoload
 (defun lb-datalog-pred-info (predicate)
