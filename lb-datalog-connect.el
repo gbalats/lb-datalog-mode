@@ -284,35 +284,68 @@ executing BODY."
         (user-error "No active region or clause at point")
       (buffer-substring-no-properties from to))))
 
+(defun lb-datalog-resolve-locals (text)
+  "Transform TEXT to resolve local predicates."
+  (lb-datalog-with-connection
+   (let ((all-preds  (lb-workspace-predicates))
+         (local-ns   (lb-datalog-local-ns)))
+     (with-temp-buffer
+       (insert text)
+       (goto-char (point-min))
+       ;; Go over each predicate name
+       (while (re-search-forward "\\([_:?$[:alnum:]]+\\)\\s-*\\s(.*?\\s)" nil t)
+         (let* ((pred (buffer-substring-no-properties
+                       (match-beginning 1)
+                       (match-end 1)))
+                (local-pred (concat local-ns pred)))
+           ;; Add namespace to local predicates
+           (unless (member pred all-preds)
+             (when (member local-pred all-preds)
+               (replace-match local-pred nil nil nil 1)))))
+       (buffer-substring-no-properties (point-min) (point-max))))))
+
 ;;;###autoload
-(defun lb-datalog-query ()
+(defun lb-datalog-query (&optional verbose)
   "Run query logic inside the selected region on active workspace.
 
-If no region is selected, then use the clause at point."
-  (interactive)
+If no region is selected, then use the clause at point.  When the
+prefix VERBOSE argument is supplied, the text will not be
+modified in any way."
+  (interactive "P")
   (lb-datalog-with-connection
     (let ((code-string (lb-datalog-clause-or-region-text)))
-      (lb-cmd-query code-string))))
+      (lb-cmd-query
+       (if verbose code-string
+         (lb-datalog-resolve-locals code-string))))))
 
 ;;;###autoload
-(defun lb-datalog-query-all ()
+(defun lb-datalog-query-all (&optional verbose)
   "Run query logic inside the selected region on all open workspaces.
 
-If no region is selected, then use the clause at point."
-  (interactive)
+If no region is selected, then use the clause at point.  When the
+prefix VERBOSE argument is supplied, the text will not be
+modified in any way."
+  (interactive "P")
   (let ((code-string (lb-datalog-clause-or-region-text)))
     (--each lb-open-connections
-      (lb-cmd-query code-string (lb-workspace-path it)))))
+      (lb-cmd-query
+       (if verbose code-string
+         (lb-datalog-resolve-locals code-string))
+       (lb-workspace-path it)))))
 
 ;;;###autoload
-(defun lb-datalog-add-block ()
+(defun lb-datalog-add-block (&optional verbose)
   "Add logic of selected region to active workspace.
 
-If no region is selected, then use the clause at point."
-  (interactive)
+If no region is selected, then use the clause at point.  When the
+prefix VERBOSE argument is supplied, the text will not be
+modified in any way."
+  (interactive "P")
   (lb-datalog-with-connection
     (let ((code-string (lb-datalog-clause-or-region-text)))
-      (lb-cmd-add code-string))))
+      (lb-cmd-add
+       (if verbose code-string
+         (lb-datalog-resolve-locals code-string))))))
 
 ;;;###autoload
 (defun lb-datalog-pop-count ()
