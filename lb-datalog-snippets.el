@@ -31,7 +31,7 @@
 ;;; Code:
 
 
-(require 'yasnippet)
+(require 'yasnippet nil 'noerror)
 
 (defvar lb-datalog-snippets-dir
   (expand-file-name
