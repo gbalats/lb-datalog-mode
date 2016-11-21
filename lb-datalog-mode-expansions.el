@@ -128,10 +128,9 @@ is no effect."
                  lb-datalog-mark-head-or-body
                  lb-datalog-mark-clause))))
 
-
-(er/enable-mode-expansions 'lb-datalog-mode
-                           'er/add-lb-datalog-mode-expansions)
-
+(when (fboundp 'er/enable-mode-expansions)
+  (er/enable-mode-expansions 'lb-datalog-mode
+                             'er/add-lb-datalog-mode-expansions))
 
 (provide 'lb-datalog-mode-expansions)
 
